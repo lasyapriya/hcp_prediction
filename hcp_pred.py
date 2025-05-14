@@ -923,6 +923,10 @@ def main():
             background-color: #ffffff !important;
             transition: background-color 0.5s ease;
         }
+        .stApp {
+        background-color: #FFFFFF;
+    
+    }
 </style>
     """, unsafe_allow_html=True)
 
