@@ -18,14 +18,14 @@ import streamlit.components.v1 as components
 from streamlit.components.v1 import html
 from io import BytesIO
 
-npi_sample_data = b"""NPI,login_date,login_hour,login_minute,logout_date,logout_hour,logout_minute,Region_Midwest,Region_Northeast,Region_South,Region_West,Speciality_Cardiology,Speciality_General Practice,Speciality_Neurology,Speciality_Oncology,Speciality_Orthopedics,Speciality_Pediatrics,Speciality_Radiology,State_TX,State_CA,Count of Survey Attempts,Usage Time (mins)
+nsample_data = b"""NPI,login_date,login_hour,login_minute,logout_date,logout_hour,logout_minute,Region_Midwest,Region_Northeast,Region_South,Region_West,Speciality_Cardiology,Speciality_General Practice,Speciality_Neurology,Speciality_Oncology,Speciality_Orthopedics,Speciality_Pediatrics,Speciality_Radiology,State_TX,State_CA,Count of Survey Attempts,Usage Time (mins)
 1234567890,2024-01-10,8,30,2024-01-10,10,0,1,0,0,0,0,1,0,0,0,0,0,1,0,5,90
 1234567891,2024-01-11,9,0,2024-01-11,11,30,0,1,0,0,0,1,0,0,0,0,1,0,0,3,120
 1234567892,2024-01-12,10,0,2024-01-12,12,0,0,0,1,0,0,1,0,0,0,0,0,1,0,2,110
 1234567893,2024-01-13,14,0,2024-01-13,16,30,0,0,0,1,1,0,0,0,0,0,1,0,0,4,150
 """
 
-survey_sample_data = b"""Survey ID,NPI,attempt_hour,attempt_minute
+ssample_data = b"""Survey ID,NPI,attempt_hour,attempt_minute
 100010,1234567890,9,0
 100010,1234567891,10,30
 100010,1234567892,11,0
@@ -1129,7 +1129,7 @@ Analyze NPI participation patterns with interactive visualization
                from io import BytesIO
                st.download_button(
                 label="Download Sample NPI File",
-                 data=BytesIO(npi_sample_data),
+                 data=BytesIO(nsample_data),
                  file_name="npi2_sample_4_rows.csv",
                 mime="text/csv",
                  key="npi_sample_button"
@@ -1228,7 +1228,7 @@ Analyze NPI participation patterns with interactive visualization
                                         """, unsafe_allow_html=True)
             st.download_button(
            label="Download Sample Survey File",
-           data=BytesIO(survey_sample_data),
+           data=BytesIO(ssample_data),
            file_name="survey2_first_4_rows.csv",
              mime="text/csv",
               key="survey_sample_download"
