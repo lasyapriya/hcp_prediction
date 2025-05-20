@@ -1093,7 +1093,13 @@ Analyze NPI participation patterns with interactive visualization
 </div>
                         </div>
   """, unsafe_allow_html=True)
-
+            st.download_button(
+    label="Download Sample NPI File",
+    data=BytesIO(npi_sample_data),
+    file_name="npi2_sample_4_rows.csv",
+    mime="text/csv",
+    key="npi_sample_download"
+            )
             if data_status['npi']['uploaded']:
                st.markdown(f"""
         <p style='text-align: left;'>
@@ -1215,7 +1221,13 @@ Analyze NPI participation patterns with interactive visualization
                         </div>
 
                                         """, unsafe_allow_html=True)
-
+            st.download_button(
+           label="Download Sample Survey File",
+           data=BytesIO(survey_sample_data),
+           file_name="survey2_first_4_rows.csv",
+             mime="text/csv",
+              key="survey_sample_download"
+            )
             if data_status['survey']['uploaded']:
                    st.markdown(f"""
                         <p style='text-align: left;'>
