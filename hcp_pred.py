@@ -510,14 +510,14 @@ def main():
     # Initialize the database
     init_db()
     with st.sidebar:
-    if "show_instructions" not in st.session_state:
+     if "show_instructions" not in st.session_state:
         st.session_state.show_instructions = False
 
-    st.markdown("<h4 style='margin-top:0;'>✦ Guide</h4>", unsafe_allow_html=True)
-    if st.button("✨ How this works"):
+     st.markdown("<h4 style='margin-top:0;'>✦ Guide</h4>", unsafe_allow_html=True)
+     if st.button("✨ How this works"):
         st.session_state.show_instructions = not st.session_state.show_instructions
 
-    if st.session_state.show_instructions:
+     if st.session_state.show_instructions:
         st.markdown("""
         <div class="glass-card magic-instructions">
             <ol style="padding-left:18px; line-height:1.9; font-family:'DM Sans', sans-serif;">
