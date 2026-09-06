@@ -672,7 +672,7 @@ def main():
             st_lottie(lottie_medical, speed=1, height=200, key="medical")
 
         # Header
-       st.markdown("""
+     st.markdown("""
 <div style='text-align:center; margin-top:20px;'>
     <div style='font-size:14px; letter-spacing:4px; color:#C98CA7; font-family:"DM Mono", monospace; text-transform:uppercase;'>
         ✦ NPI Pulse ✦
@@ -686,7 +686,7 @@ def main():
         
         
 # Subtitle
-        st.markdown("""
+      st.markdown("""
 <div style='
 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, 
 "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
@@ -696,7 +696,7 @@ text-align: center;
 margin-top: 10px;
 '>
 Analyze NPI participation patterns with interactive visualization
-</div>
+</div> 
 """, unsafe_allow_html=True)
         st.markdown("""
     <div style="margin-bottom: 40px;"></div>
