@@ -509,7 +509,27 @@ def create_visualizations(active_npi_data):
 def main():
     # Initialize the database
     init_db()
+    with st.sidebar:
+    if "show_instructions" not in st.session_state:
+        st.session_state.show_instructions = False
 
+    st.markdown("<h4 style='margin-top:0;'>✦ Guide</h4>", unsafe_allow_html=True)
+    if st.button("✨ How this works"):
+        st.session_state.show_instructions = not st.session_state.show_instructions
+
+    if st.session_state.show_instructions:
+        st.markdown("""
+        <div class="glass-card magic-instructions">
+            <ol style="padding-left:18px; line-height:1.9; font-family:'DM Sans', sans-serif;">
+                <li>Download the <b>sample NPI file</b></li>
+                <li>Download the <b>sample Survey file</b></li>
+                <li>Upload your own NPI CSV and save it</li>
+                <li>Upload your own Survey CSV and save it</li>
+                <li>Once both are saved, you'll move to Analysis automatically</li>
+                <li>Pick a Survey ID and time, then run the analysis</li>
+            </ol>
+        </div>
+        """, unsafe_allow_html=True)
     # Initialize session state variables
     if 'initial_load' not in st.session_state:
         st.session_state.initial_load = True
@@ -652,17 +672,15 @@ def main():
             st_lottie(lottie_medical, speed=1, height=200, key="medical")
 
         # Header
-        st.markdown("""
-<div style='
-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, 
-"Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-font-size: 80px;
-font-weight: 700;
-color: #4B006E;
-text-align: center;
-margin-top: 30px;
-'>
-HCP Campaign Prediction
+       st.markdown("""
+<div style='text-align:center; margin-top:20px;'>
+    <div style='font-size:14px; letter-spacing:4px; color:#C98CA7; font-family:"DM Mono", monospace; text-transform:uppercase;'>
+        ✦ NPI Pulse ✦
+    </div>
+    <h1 style='margin-top:6px;'>HCP Campaign Prediction</h1>
+    <div style='font-size:17px; color:#6B5468; font-family:"DM Sans", sans-serif; margin-top:6px;'>
+        Understand who's active, when, and how likely they are to engage.
+    </div>
 </div>
 """, unsafe_allow_html=True)
         
@@ -1191,21 +1209,21 @@ input[type="text"]:focus, input[type="time"]:focus, input[type="number"]:focus {
                     col1, col2, col3 = st.columns(3)
                     with col1:
                         st.markdown(f"""
-                            <div class='card'>
+                            <div class='glass-card'>
                                 <h4>Total NPIs</h4>
                                 <p style='font-size: 24px; color: #3498db;'>{result['Total NPIs in Database']}</p>
                             </div>
                         """, unsafe_allow_html=True)
                     with col2:
                         st.markdown(f"""
-                            <div class='card'>
+                            <div class='glass-card'>
                                 <h4>Active NPIs</h4>
                                 <p style='font-size: 24px; color: #3498db;'>{result['Active NPIs at Analysis Time']}</p>
                             </div>
                         """, unsafe_allow_html=True)
                     with col3:
                         st.markdown(f"""
-                            <div class='card'>
+                            <div class='glass-card'>
                                 <h4>Participation</h4>
                                 <p style='font-size: 24px; color: #3498db;'>{result['Participation Percentage']:.2f}%</p>
                             </div>
@@ -1217,20 +1235,20 @@ input[type="text"]:focus, input[type="time"]:focus, input[type="number"]:focus {
                         )
                         col1, col2 = st.columns(2)
                         with col1:
-                            st.markdown('<div class="graph-card"><h4>Active NPIs by Region</h4>', unsafe_allow_html=True)
+                            st.markdown('<div class="glass-card"><h4>Active NPIs by Region</h4>', unsafe_allow_html=True)
                             st.plotly_chart(fig_region, use_container_width=True)
                             st.markdown('</div>', unsafe_allow_html=True)
-                            st.markdown('<div class="graph-card"><h4>Active NPIs by State (Top 15)</h4>', unsafe_allow_html=True)
+                            st.markdown('<div class="glass-card"><h4>Active NPIs by State (Top 15)</h4>', unsafe_allow_html=True)
                             st.plotly_chart(fig_state, use_container_width=True)
                             st.markdown('</div>', unsafe_allow_html=True)
                         with col2:
-                            st.markdown('<div class="graph-card"><h4>Active NPIs by Specialty</h4>', unsafe_allow_html=True)
+                            st.markdown('<div class="glass-card"><h4>Active NPIs by Specialty</h4>', unsafe_allow_html=True)
                             st.plotly_chart(fig_specialty, use_container_width=True)
                             st.markdown('</div>', unsafe_allow_html=True)
-                            st.markdown('<div class="graph-card"><h4>Participation Rate by Region</h4>', unsafe_allow_html=True)
+                            st.markdown('<div class="glass-card"><h4>Participation Rate by Region</h4>', unsafe_allow_html=True)
                             st.plotly_chart(fig_region_part, use_container_width=True)
                             st.markdown('</div>', unsafe_allow_html=True)
-                        st.markdown('<div class="graph-card"><h4>Participation Rate by Specialty</h4>', unsafe_allow_html=True)
+                        st.markdown('<div class="glass-card"><h4>Participation Rate by Specialty</h4>', unsafe_allow_html=True)
                         st.plotly_chart(fig_specialty_part, use_container_width=True)
                         st.markdown('</div>', unsafe_allow_html=True)
                     
@@ -1299,7 +1317,7 @@ input[type="text"]:focus, input[type="time"]:focus, input[type="number"]:focus {
             
             col1, col2 = st.columns(2)
             with col1:
-                st.markdown('<div class="graph-card"><h4>NPIs by Region</h4>', unsafe_allow_html=True)
+                st.markdown('<div class="glass-card"><h4>NPIs by Region</h4>', unsafe_allow_html=True)
                 fig_region_all = px.bar(region_df, x='Region', y='Count', title='', color='Region', height=400)
                 st.plotly_chart(fig_region_all, use_container_width=True)
                 st.markdown('</div>', unsafe_allow_html=True)
