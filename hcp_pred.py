@@ -666,13 +666,14 @@ def main():
 
     # Initial view (shown until both files are uploaded)
     if not st.session_state.show_analysis and not st.session_state.show_transition:
-        # Lottie animation
-        col1, col2, col3 = st.columns([2, 2, 2])
-        with col2:
-            st_lottie(lottie_medical, speed=1, height=200, key="medical")
+    # Lottie animation
+    col1, col2, col3 = st.columns([2, 2, 2])
 
-        # Header
-     st.markdown("""
+    with col2:
+        st_lottie(lottie_medical, speed=1, height=200, key="medical")
+
+    # Header
+    st.markdown("""
 <div style='text-align:center; margin-top:20px;'>
     <div style='font-size:14px; letter-spacing:4px; color:#C98CA7; font-family:"DM Mono", monospace; text-transform:uppercase;'>
         ✦ NPI Pulse ✦
@@ -683,10 +684,9 @@ def main():
     </div>
 </div>
 """, unsafe_allow_html=True)
-        
-        
-# Subtitle
-      st.markdown("""
+
+    # Subtitle
+    st.markdown("""
 <div style='
 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, 
 "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
@@ -698,12 +698,14 @@ margin-top: 10px;
 Analyze NPI participation patterns with interactive visualization
 </div> 
 """, unsafe_allow_html=True)
-        st.markdown("""
-    <div style="margin-bottom: 40px;"></div>
+
+    st.markdown("""
+<div style="margin-bottom: 40px;"></div>
 """, unsafe_allow_html=True)
-        # Data upload section
-        with st.expander("Data Management", expanded=True):
-            st.markdown("""
+
+    # Data upload section
+    with st.expander("Data Management", expanded=True):
+        st.markdown("""
     <style>
     .section-box {
         border: 2px solid #D8BFD8;
@@ -713,6 +715,7 @@ Analyze NPI participation patterns with interactive visualization
         background-color: transparent;
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
+
     .section-heading {
         font-size: 26px;
         font-weight: bold;
@@ -720,6 +723,7 @@ Analyze NPI participation patterns with interactive visualization
         text-align: center;
         margin-bottom: 10px;
     }
+
     .status {
         text-align: left;
         font-style: italic;
