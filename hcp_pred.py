@@ -667,13 +667,13 @@ def main():
     # Initial view (shown until both files are uploaded)
     if not st.session_state.show_analysis and not st.session_state.show_transition:
     # Lottie animation
-    col1, col2, col3 = st.columns([2, 2, 2])
+     col1, col2, col3 = st.columns([2, 2, 2])
 
-    with col2:
+     with col2:
         st_lottie(lottie_medical, speed=1, height=200, key="medical")
 
     # Header
-    st.markdown("""
+     st.markdown("""
 <div style='text-align:center; margin-top:20px;'>
     <div style='font-size:14px; letter-spacing:4px; color:#C98CA7; font-family:"DM Mono", monospace; text-transform:uppercase;'>
         ✦ NPI Pulse ✦
@@ -686,7 +686,7 @@ def main():
 """, unsafe_allow_html=True)
 
     # Subtitle
-    st.markdown("""
+     st.markdown("""
 <div style='
 font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, 
 "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
@@ -699,12 +699,12 @@ Analyze NPI participation patterns with interactive visualization
 </div> 
 """, unsafe_allow_html=True)
 
-    st.markdown("""
+     st.markdown("""
 <div style="margin-bottom: 40px;"></div>
 """, unsafe_allow_html=True)
 
     # Data upload section
-    with st.expander("Data Management", expanded=True):
+     with st.expander("Data Management", expanded=True):
         st.markdown("""
     <style>
     .section-box {
