@@ -735,7 +735,7 @@ Analyze NPI participation patterns with interactive visualization
 
             
             # Reset Database Button
-            if st.button("Reset Database", key="reset_db"):
+     if st.button("Reset Database", key="reset_db"):
                 conn = sqlite3.connect('npi_survey_data.db')
                 c = conn.cursor()
                 c.execute("DROP TABLE IF EXISTS data_status")
@@ -819,7 +819,7 @@ Analyze NPI participation patterns with interactive visualization
 1234567892,2024-01-12,10,0,2024-01-12,12,0,0,0,1,0,0,1,0,0,0,0,0,1,0,2,110
 1234567893,2024-01-13,14,0,2024-01-13,16,30,0,0,0,1,1,0,0,0,0,0,1,0,0,4,150
 """
-            st.download_button(
+     st.download_button(
             label="Download Sample NPI File",
             data=BytesIO(nsample_data),
             file_name="npi2_sample_4_rows.csv",
