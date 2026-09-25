@@ -578,7 +578,10 @@ GLOBAL_CSS = """
     --text:#F7EAF2; --text-2:#EADDE7; --dim:#B9AAB8;
     --card-bg: rgba(20,10,24,0.55);
     --card-bd: 1px solid rgba(255,105,150,0.18);
-    --r-lg: 26px; --r-md: 20px; --r-sm: 14px;
+    /* asymmetric "petal" corners instead of plain rectangles */
+    --r-lg: 46px 16px 46px 16px;
+    --r-md: 34px 12px 34px 12px;
+    --r-sm: 20px 8px 20px 8px;
     --serif:'Cormorant Garamond', Georgia, serif;
     --sans:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
@@ -596,12 +599,23 @@ GLOBAL_CSS = """
 }
 .stApp [data-testid="stAppViewContainer"] { background:transparent !important; }
 [data-testid="stHeader"] { background:transparent !important; }
-.block-container { padding-top:2.2rem !important; max-width:1340px; }
+/* full-bleed: let the site use the whole viewport instead of a boxed column */
+.block-container {
+    padding-top:2.2rem !important;
+    max-width:100% !important;
+    padding-left:clamp(20px, 3.6vw, 64px) !important;
+    padding-right:clamp(20px, 3.6vw, 64px) !important;
+}
+[data-testid="stAppViewContainer"] > .main { padding-left:0 !important; padding-right:0 !important; }
 
 html, body, [class*="css"], p, li, span, label,
 div[data-testid="stMarkdownContainer"] { font-family:var(--sans); color:var(--text-2); }
 
 .bio-field { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+.bio-organism { position:absolute; top:-9%; right:-9%; width:min(78vw, 980px); opacity:0.60;
+                animation:organismDrift 46s ease-in-out infinite; mix-blend-mode:screen; }
+@keyframes organismDrift { 0%,100%{transform:translate(0,0) scale(1) rotate(0deg);}
+                            50%{transform:translate(-26px,34px) scale(1.05) rotate(1.4deg);} }
 .bio-blob { position:absolute; border-radius:50%; filter:blur(86px); opacity:0.46; mix-blend-mode:screen; }
 .b1 { width:560px; height:560px; top:-10%; right:-4%;
       background:radial-gradient(circle at 38% 38%, rgba(255,79,135,0.62), transparent 68%);
@@ -695,6 +709,18 @@ h4 { font-size:21px !important; }
 .metric .val { font-family:var(--serif); font-size:42px; line-height:1.05; color:var(--text); margin-top:8px; }
 .metric .key { font-family:var(--sans); font-size:10px; font-weight:500; letter-spacing:2.4px;
                text-transform:uppercase; color:var(--dim); margin-top:8px; }
+
+/* native bordered containers (st.container(border=True)) styled as real cards */
+div[data-testid="stVerticalBlockBorderWrapper"]:has(> div > div[data-testid="stVerticalBlock"]) {
+    background:var(--card-bg) !important; border:var(--card-bd) !important;
+    border-radius:var(--r-lg) !important; backdrop-filter:blur(18px);
+    box-shadow:0 14px 40px rgba(0,0,0,0.38); padding:8px 6px; margin-bottom:20px;
+    transition:border-color .45s ease, transform .45s ease, box-shadow .45s ease;
+}
+div[data-testid="stVerticalBlockBorderWrapper"]:hover {
+    transform:translateY(-3px); border-color:rgba(255,105,150,0.34) !important;
+    box-shadow:0 20px 50px rgba(0,0,0,0.46), 0 0 26px rgba(255,79,135,0.10);
+}
 
 .instrument { border-radius:var(--r-lg); padding:34px 38px; margin-bottom:26px; }
 .instrument::before { content:""; position:absolute; inset:-1px; border-radius:inherit; pointer-events:none;
@@ -795,6 +821,16 @@ div[data-testid="stAlert"] { background:rgba(255,79,135,0.09) !important;
 .g-txt { font-family:var(--sans); font-size:14px; line-height:1.6; color:var(--text-2); padding-top:7px; }
 .g-tip { margin-top:28px; padding:18px 20px; border-radius:var(--r-md);
          border:1px solid rgba(166,108,255,0.22); background:rgba(139,77,255,0.08); }
+/* keep the toggle clickable even while the scrim is up, and style the
+   dedicated in-drawer close button so the guide can always be dismissed */
+.st-key-guidelines_toggle { position:relative; z-index:1001; }
+.st-key-guidelines_close { position:fixed !important; top:40px; right:calc(min(400px, 92vw) - 78px);
+    z-index:1001; width:44px !important; }
+.st-key-guidelines_close button {
+    width:44px !important; height:44px !important; padding:0 !important; border-radius:50% !important;
+    font-size:16px !important; display:flex !important; align-items:center; justify-content:center;
+}
+@media (max-width: 900px) { .st-key-guidelines_close { right:22px; } }
 
 /* ---------- 10 · NAV RAIL ---------- */
 section[data-testid="stSidebar"] {
@@ -848,6 +884,45 @@ section[data-testid="stSidebar"] * { color:var(--text-2); font-family:var(--sans
 </style>
 
 <div class="bio-field">
+    <svg class="bio-organism" viewBox="0 0 460 420" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <radialGradient id="bgcore" cx="50%" cy="50%">
+          <stop offset="0%"   stop-color="#FFB08A" stop-opacity="0.95"/>
+          <stop offset="34%"  stop-color="#FF5C8A" stop-opacity="0.55"/>
+          <stop offset="68%"  stop-color="#8B4DFF" stop-opacity="0.20"/>
+          <stop offset="100%" stop-color="#8B4DFF" stop-opacity="0"/>
+        </radialGradient>
+        <linearGradient id="bgthread" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%"   stop-color="#FF4F87"/>
+          <stop offset="52%"  stop-color="#FF8A65"/>
+          <stop offset="100%" stop-color="#A66CFF"/>
+        </linearGradient>
+        <filter id="bgsoft"><feGaussianBlur stdDeviation="5"/></filter>
+      </defs>
+      <circle cx="240" cy="205" r="150" fill="url(#bgcore)">
+        <animate attributeName="r" values="142;168;142" dur="15s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values="0.65;1;0.65" dur="15s" repeatCount="indefinite"/>
+      </circle>
+      <g stroke="url(#bgthread)" fill="none" stroke-width="1.4" filter="url(#bgsoft)">
+        <path d="M40,300 C130,268 140,168 240,152 C340,136 372,82 440,110">
+          <animate attributeName="stroke-opacity" values="0.3;0.95;0.3" dur="10s" repeatCount="indefinite"/></path>
+        <path d="M28,160 C140,200 168,272 268,272 C356,272 392,326 452,296">
+          <animate attributeName="stroke-opacity" values="0.9;0.28;0.9" dur="14s" repeatCount="indefinite"/></path>
+        <path d="M244,18 C204,112 300,158 272,242 C252,306 312,342 298,404">
+          <animate attributeName="stroke-opacity" values="0.38;0.88;0.38" dur="16s" repeatCount="indefinite"/></path>
+        <path d="M110,40 C186,96 148,208 222,254 C288,296 274,352 356,372">
+          <animate attributeName="stroke-opacity" values="0.8;0.22;0.8" dur="19s" repeatCount="indefinite"/></path>
+        <path d="M60,382 C150,356 196,300 240,206 C276,132 350,140 420,190">
+          <animate attributeName="stroke-opacity" values="0.24;0.7;0.24" dur="22s" repeatCount="indefinite"/></path>
+      </g>
+      <g fill="#FFB08A">
+        <circle cx="240" cy="152" r="3"><animate attributeName="r" values="2;5.2;2" dur="7s" repeatCount="indefinite"/></circle>
+        <circle cx="268" cy="272" r="2.6" fill="#FF6F9D"><animate attributeName="r" values="1.6;4.6;1.6" dur="9s" repeatCount="indefinite"/></circle>
+        <circle cx="148" cy="188" r="2.2" fill="#A66CFF"><animate attributeName="r" values="1.4;4;1.4" dur="11s" repeatCount="indefinite"/></circle>
+        <circle cx="352" cy="96"  r="2.4"><animate attributeName="r" values="1.5;4.2;1.5" dur="8s" repeatCount="indefinite"/></circle>
+        <circle cx="300" cy="360" r="2" fill="#FF4F87"><animate attributeName="r" values="1.2;3.8;1.2" dur="13s" repeatCount="indefinite"/></circle>
+      </g>
+    </svg>
     <div class="bio-blob b1"></div><div class="bio-blob b2"></div><div class="bio-blob b3"></div>
     <div class="mote m1"></div><div class="mote m2"></div><div class="mote m3"></div>
     <div class="mote m4"></div><div class="mote m5"></div><div class="mote m6"></div>
@@ -1119,6 +1194,12 @@ def main():
 
     if st.session_state.show_guidelines:
         st.markdown(guidelines_drawer(), unsafe_allow_html=True)
+        # Dedicated close control that always sits above the scrim, so the
+        # guide can never trap the screen — click it, or the header toggle,
+        # to dismiss.
+        if st.button("✕", key="guidelines_close"):
+            st.session_state.show_guidelines = False
+            st.rerun()
 
     # Check if data is already in the database
     data_status = check_data_status()
@@ -1127,25 +1208,22 @@ def main():
     # LANDING — hero, then upload
     # =======================================================================
     if not st.session_state.show_analysis and not st.session_state.show_transition:
-        hero_left, hero_right = st.columns([1.05, 1], gap="large")
-
-        with hero_left:
-            st.markdown("""
-            <div style="padding-top:38px;">
-                <span class="eyebrow rise">Human behavior. Data intelligence.</span>
-                <div class="hero-h rise-2">Smarter<br><em>Healthcare</em><br>Connections</div>
-                <p class="lede rise-3" style="margin-top:24px;">
-                    AI-powered predictions to understand HCP availability and engagement.
-                </p>
-            </div>
-            """, unsafe_allow_html=True)
-            st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
-            if st.button("Try prediction →", key="hero_cta", type="primary"):
-                st.session_state.show_guidelines = True
-                st.rerun()
-
-        with hero_right:
-            st.markdown(HERO_ORGANISM, unsafe_allow_html=True)
+        # The bioluminescent organism now lives in the fixed page background
+        # (see .bio-organism in GLOBAL_CSS) — it's part of the environment,
+        # not boxed into a hero column or card.
+        st.markdown("""
+        <div style="padding-top:38px; max-width:640px;">
+            <span class="eyebrow rise">Human behavior. Data intelligence.</span>
+            <div class="hero-h rise-2">Smarter<br><em>Healthcare</em><br>Connections</div>
+            <p class="lede rise-3" style="margin-top:24px;">
+                AI-powered predictions to understand HCP availability and engagement.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
+        if st.button("Try prediction →", key="hero_cta", type="primary"):
+            st.session_state.show_guidelines = True
+            st.rerun()
 
         st.markdown('<div class="spacer-xl"></div>', unsafe_allow_html=True)
 
@@ -1174,140 +1252,163 @@ def main():
             npi_col, survey_col = st.columns(2, gap="large")
 
             # ---------------- NPI ----------------
-            with npi_col:
-                st.markdown(
-                    '<span class="eyebrow">Source 01</span>'
-                    '<div class="sec-h" style="font-size:34px; margin-top:10px;">NPI Data</div>'
-                    '<div class="sec-d">Login windows, usage time, region and specialty signals.</div>'
-                    '<div style="height:18px;"></div>',
-                    unsafe_allow_html=True
-                )
-
-                nsample_data = b"""NPI,login_date,login_hour,login_minute,logout_date,logout_hour,logout_minute,Region_Midwest,Region_Northeast,Region_South,Region_West,Speciality_Cardiology,Speciality_General Practice,Speciality_Neurology,Speciality_Oncology,Speciality_Orthopedics,Speciality_Pediatrics,Speciality_Radiology,State_TX,State_CA,Count of Survey Attempts,Usage Time (mins)
+            nsample_data = b"""NPI,login_date,login_hour,login_minute,logout_date,logout_hour,logout_minute,Region_Midwest,Region_Northeast,Region_South,Region_West,Speciality_Cardiology,Speciality_General Practice,Speciality_Neurology,Speciality_Oncology,Speciality_Orthopedics,Speciality_Pediatrics,Speciality_Radiology,State_TX,State_CA,Count of Survey Attempts,Usage Time (mins)
 1234567890,2024-01-10,8,30,2024-01-10,10,0,1,0,0,0,0,1,0,0,0,0,0,1,0,5,90
 1234567891,2024-01-11,9,0,2024-01-11,11,30,0,1,0,0,0,1,0,0,0,0,1,0,0,3,120
 1234567892,2024-01-12,10,0,2024-01-12,12,0,0,0,1,0,0,1,0,0,0,0,0,1,0,2,110
 1234567893,2024-01-13,14,0,2024-01-13,16,30,0,0,0,1,1,0,0,0,0,0,1,0,0,4,150
 """
-                st.download_button(
-                    label="Download sample NPI file",
-                    data=BytesIO(nsample_data),
-                    file_name="npi2_sample_4_rows.csv",
-                    mime="text/csv",
-                    key="npi_sample_download"
-                )
-
-                if data_status['npi']['uploaded']:
-                    st.markdown(
-                        f"<div class='log-line'>● uploaded on {data_status['npi']['last_updated']}</div>",
-                        unsafe_allow_html=True
-                    )
-                    if st.button("Clear NPI data", key="clear_npi"):
-                        clear_data('npi')
-                        st.success("NPI data cleared successfully!")
-                        st.session_state.show_analysis = False
-
-                        st.rerun()
-                else:
-                    st.markdown("<div class='log-line'>○ awaiting signal</div>", unsafe_allow_html=True)
-                    npi_file = st.file_uploader("Drag and drop file here", type=['csv'], key="npi_uploader")
-
-                    st.session_state.npi_file = npi_file
-                    if st.session_state.npi_file is not None:
-                        if st.button("Save NPI data", key="save_npi"):
-                            with st.spinner("Reading signals..."):
-                                try:
-                                    npi_df = pd.read_csv(st.session_state.npi_file)
-                                    if npi_df.empty:
-                                        st.error("The uploaded NPI CSV file is empty.")
-                                    else:
-                                        st.session_state.npi_df = preprocess_npi_data(npi_df)
-                                        st.session_state.npi_file.seek(0)
-                                        if store_csv_data('npi', st.session_state.npi_file):
-                                            st.markdown(
-                                                '<div class="card" style="text-align:center; padding:22px;">'
-                                                '<span class="eyebrow">Signal received</span>'
-                                                '<div class="card-h" style="font-size:28px; margin-top:8px;">'
-                                                'NPI data absorbed</div></div>',
-                                                unsafe_allow_html=True
-                                            )
-                                            time.sleep(1.4)
-                                            st.success("NPI data uploaded successfully!")
-                                            new_data_status = check_data_status()
-                                            if new_data_status['survey']['uploaded']:
-                                                st.session_state.show_transition = True
-                                                st.rerun()
-                                except Exception as e:
-                                    st.error(f"Error processing NPI CSV: {str(e)}")
-
-            # ---------------- SURVEY ----------------
-            with survey_col:
-                st.markdown(
-                    '<span class="eyebrow">Source 02</span>'
-                    '<div class="sec-h" style="font-size:34px; margin-top:10px;">Survey Data</div>'
-                    '<div class="sec-d">Recorded survey attempts, by NPI and time of attempt.</div>'
-                    '<div style="height:18px;"></div>',
-                    unsafe_allow_html=True
-                )
-
-                ssample_data = b"""Survey ID,NPI,attempt_hour,attempt_minute
+            ssample_data = b"""Survey ID,NPI,attempt_hour,attempt_minute
 100010,1234567890,9,0
 100010,1234567891,10,30
 100010,1234567892,11,0
 100010,1234567893,15,0
 """
-                st.download_button(
-                    label="Download sample survey file",
-                    data=BytesIO(ssample_data),
-                    file_name="survey2_first_4_rows.csv",
-                    mime="text/csv",
-                    key="survey_sample_download"
-                )
 
-                if data_status['survey']['uploaded']:
+            def save_bytes(data_type, file_bytes, preprocess=False):
+                """Read once from bytes and persist — avoids stream-position issues
+                that come from reusing an UploadedFile object across two reads."""
+                df = pd.read_csv(io.BytesIO(file_bytes))
+                if df.empty:
+                    st.error(f"The {data_type} CSV is empty.")
+                    return False
+                if preprocess:
+                    st.session_state.npi_df = preprocess_npi_data(df)
+                else:
+                    st.session_state.survey_df = df
+                return store_csv_data(data_type, io.BytesIO(file_bytes))
+
+            # ---------------- NPI ----------------
+            with npi_col:
+                with st.container(border=True):
                     st.markdown(
-                        f"<div class='log-line'>● uploaded on {data_status['survey']['last_updated']}</div>",
+                        '<div style="padding:18px 20px 4px;">'
+                        '<span class="eyebrow">Source 01</span>'
+                        '<div class="sec-h" style="font-size:34px; margin-top:10px;">NPI Data</div>'
+                        '<div class="sec-d">Login windows, usage time, region and specialty signals.</div>'
+                        '</div>',
                         unsafe_allow_html=True
                     )
-                    if st.button("Clear survey data", key="clear_survey"):
-                        clear_data('survey')
-                        st.success("Survey data cleared successfully!")
-                        st.session_state.show_analysis = False
+                    with st.container():
+                        st.markdown('<div style="padding:0 20px;">', unsafe_allow_html=True)
 
-                        st.rerun()
-                else:
-                    st.markdown("<div class='log-line'>○ awaiting signal</div>", unsafe_allow_html=True)
-                    survey_file = st.file_uploader("Drag and drop file here", type=['csv'], key="survey_uploader")
+                        if data_status['npi']['uploaded']:
+                            st.markdown(
+                                f"<div class='log-line'>● uploaded on {data_status['npi']['last_updated']}</div>",
+                                unsafe_allow_html=True
+                            )
+                            if st.button("Clear NPI data", key="clear_npi"):
+                                clear_data('npi')
+                                st.success("NPI data cleared successfully!")
+                                st.session_state.show_analysis = False
+                                st.rerun()
+                        else:
+                            st.markdown("<div class='log-line'>○ awaiting signal</div>", unsafe_allow_html=True)
 
-                    st.session_state.survey_file = survey_file
-                    if st.session_state.survey_file is not None:
-                        if st.button("Save survey data", key="save_survey"):
-                            with st.spinner("Reading signals..."):
+                            if st.button("⚡ Use sample data instantly", key="npi_sample_instant"):
                                 try:
-                                    survey_df = pd.read_csv(st.session_state.survey_file)
-                                    if survey_df.empty:
-                                        st.error("The uploaded Survey CSV file is empty.")
-                                    else:
-                                        st.session_state.survey_df = survey_df
-                                        st.session_state.survey_file.seek(0)
-                                        if store_csv_data('survey', st.session_state.survey_file):
-                                            st.markdown(
-                                                '<div class="card" style="text-align:center; padding:22px;">'
-                                                '<span class="eyebrow">Signal received</span>'
-                                                '<div class="card-h" style="font-size:28px; margin-top:8px;">'
-                                                'Survey data absorbed</div></div>',
-                                                unsafe_allow_html=True
-                                            )
-                                            time.sleep(1.2)
-                                            st.markdown("<div class='log-line'>model ready</div>",
-                                                        unsafe_allow_html=True)
-                                            st.success("Survey data uploaded successfully!")
-                                            new_data_status = check_data_status()
-                                            if new_data_status['npi']['uploaded']:
-                                                st.session_state.show_transition = True
-                                                st.rerun()
+                                    if save_bytes('npi', nsample_data, preprocess=True):
+                                        st.success("Sample NPI data loaded!")
+                                        new_data_status = check_data_status()
+                                        if new_data_status['survey']['uploaded']:
+                                            st.session_state.show_transition = True
+                                        st.rerun()
                                 except Exception as e:
-                                    st.error(f"Error processing Survey CSV: {str(e)}")
+                                    st.error(f"Error loading sample NPI data: {str(e)}")
+
+                            bcol1, bcol2 = st.columns(2)
+                            with bcol1:
+                                st.download_button(
+                                    label="Download sample",
+                                    data=BytesIO(nsample_data),
+                                    file_name="npi2_sample_4_rows.csv",
+                                    mime="text/csv",
+                                    key="npi_sample_download"
+                                )
+                            npi_file = st.file_uploader("Or drag and drop your own file", type=['csv'], key="npi_uploader")
+                            st.session_state.npi_file = npi_file
+
+                            if st.session_state.npi_file is not None:
+                                if st.button("Save NPI data", key="save_npi", type="primary"):
+                                    with st.spinner("Reading signals..."):
+                                        try:
+                                            file_bytes = st.session_state.npi_file.getvalue()
+                                            if save_bytes('npi', file_bytes, preprocess=True):
+                                                st.success("NPI data uploaded successfully!")
+                                                new_data_status = check_data_status()
+                                                if new_data_status['survey']['uploaded']:
+                                                    st.session_state.show_transition = True
+                                                st.rerun()
+                                        except Exception as e:
+                                            st.error(f"Error processing NPI CSV: {str(e)}")
+                        st.markdown('</div>', unsafe_allow_html=True)
+                    st.markdown('<div style="height:14px;"></div>', unsafe_allow_html=True)
+
+            # ---------------- SURVEY ----------------
+            with survey_col:
+                with st.container(border=True):
+                    st.markdown(
+                        '<div style="padding:18px 20px 4px;">'
+                        '<span class="eyebrow">Source 02</span>'
+                        '<div class="sec-h" style="font-size:34px; margin-top:10px;">Survey Data</div>'
+                        '<div class="sec-d">Recorded survey attempts, by NPI and time of attempt.</div>'
+                        '</div>',
+                        unsafe_allow_html=True
+                    )
+                    with st.container():
+                        st.markdown('<div style="padding:0 20px;">', unsafe_allow_html=True)
+
+                        if data_status['survey']['uploaded']:
+                            st.markdown(
+                                f"<div class='log-line'>● uploaded on {data_status['survey']['last_updated']}</div>",
+                                unsafe_allow_html=True
+                            )
+                            if st.button("Clear survey data", key="clear_survey"):
+                                clear_data('survey')
+                                st.success("Survey data cleared successfully!")
+                                st.session_state.show_analysis = False
+                                st.rerun()
+                        else:
+                            st.markdown("<div class='log-line'>○ awaiting signal</div>", unsafe_allow_html=True)
+
+                            if st.button("⚡ Use sample data instantly", key="survey_sample_instant"):
+                                try:
+                                    if save_bytes('survey', ssample_data, preprocess=False):
+                                        st.success("Sample survey data loaded!")
+                                        new_data_status = check_data_status()
+                                        if new_data_status['npi']['uploaded']:
+                                            st.session_state.show_transition = True
+                                        st.rerun()
+                                except Exception as e:
+                                    st.error(f"Error loading sample survey data: {str(e)}")
+
+                            bcol1, bcol2 = st.columns(2)
+                            with bcol1:
+                                st.download_button(
+                                    label="Download sample",
+                                    data=BytesIO(ssample_data),
+                                    file_name="survey2_first_4_rows.csv",
+                                    mime="text/csv",
+                                    key="survey_sample_download"
+                                )
+                            survey_file = st.file_uploader("Or drag and drop your own file", type=['csv'], key="survey_uploader")
+                            st.session_state.survey_file = survey_file
+
+                            if st.session_state.survey_file is not None:
+                                if st.button("Save survey data", key="save_survey", type="primary"):
+                                    with st.spinner("Reading signals..."):
+                                        try:
+                                            file_bytes = st.session_state.survey_file.getvalue()
+                                            if save_bytes('survey', file_bytes, preprocess=False):
+                                                st.success("Survey data uploaded successfully!")
+                                                new_data_status = check_data_status()
+                                                if new_data_status['npi']['uploaded']:
+                                                    st.session_state.show_transition = True
+                                                st.rerun()
+                                        except Exception as e:
+                                            st.error(f"Error processing Survey CSV: {str(e)}")
+                        st.markdown('</div>', unsafe_allow_html=True)
+                    st.markdown('<div style="height:14px;"></div>', unsafe_allow_html=True)
 
         st.markdown('<div class="spacer-lg"></div>', unsafe_allow_html=True)
         st.markdown(FOOTER, unsafe_allow_html=True)
