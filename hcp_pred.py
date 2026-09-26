@@ -651,11 +651,13 @@ GLOBAL_CSS = """
 }
 .stApp [data-testid="stAppViewContainer"] { background:transparent !important; }
 [data-testid="stHeader"] { background:transparent !important; }
-/* Full viewport width — no boxed/centered app feel — with generous, responsive
-   internal margins so content still breathes on very wide monitors. */
+/* Full viewport canvas — keep the interface layered over the atmosphere instead
+   of putting it inside a narrow centered dashboard window. */
 .block-container {
     padding-top:2.2rem !important;
-    max-width:min(1880px, 96vw) !important;
+    width:100% !important;
+    max-width:none !important;
+    margin:0 !important;
     padding-left:clamp(20px, 3vw, 56px) !important;
     padding-right:clamp(20px, 3vw, 56px) !important;
 }
@@ -664,6 +666,35 @@ html, body, [class*="css"], p, li, span, label,
 div[data-testid="stMarkdownContainer"] { font-family:var(--sans); color:var(--text-2); }
 
 .bio-field { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+.bio-field::before {
+    content:""; position:absolute; width:min(68vw, 980px); aspect-ratio:1;
+    top:-15%; right:-13%; border-radius:50%;
+    background:
+        radial-gradient(ellipse 18% 48% at 50% 4%, rgba(255,79,135,0.34), transparent 72%),
+        radial-gradient(ellipse 18% 48% at 50% 96%, rgba(166,108,255,0.26), transparent 72%),
+        radial-gradient(ellipse 48% 18% at 4% 50%, rgba(255,138,101,0.26), transparent 72%),
+        radial-gradient(ellipse 48% 18% at 96% 50%, rgba(255,111,157,0.30), transparent 72%),
+        radial-gradient(ellipse 24% 42% at 20% 18%, rgba(139,77,255,0.24), transparent 72%),
+        radial-gradient(ellipse 24% 42% at 80% 82%, rgba(255,176,138,0.22), transparent 72%),
+        radial-gradient(circle at 50% 50%, rgba(255,92,138,0.48), rgba(139,77,255,0.10) 42%, transparent 70%);
+    filter:blur(22px); opacity:0.72; mix-blend-mode:screen;
+    transform:rotate(-16deg); animation:flowerDrift 42s ease-in-out infinite;
+}
+.bio-field::after {
+    content:""; position:absolute; width:min(44vw, 620px); aspect-ratio:1;
+    top:3%; right:5%; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,176,138,0.22) 0 3%, rgba(255,79,135,0.14) 16%, transparent 62%);
+    filter:blur(36px); opacity:0.56; mix-blend-mode:screen;
+    animation:flowerPulse 16s ease-in-out infinite;
+}
+@keyframes flowerDrift {
+    0%,100% { transform:rotate(-16deg) scale(0.96) translate(0,0); }
+    50% { transform:rotate(-4deg) scale(1.05) translate(-34px,34px); }
+}
+@keyframes flowerPulse {
+    0%,100% { transform:scale(0.92); opacity:0.42; }
+    50% { transform:scale(1.08); opacity:0.72; }
+}
 .bio-blob { position:absolute; border-radius:50%; filter:blur(86px); opacity:0.46; mix-blend-mode:screen; }
 .b1 { width:620px; height:620px; top:-12%; right:-4%;
       background:radial-gradient(circle at 38% 38%, rgba(255,79,135,0.64), transparent 68%);
@@ -882,12 +913,14 @@ div[data-testid="stAlert"] { background:rgba(255,79,135,0.09) !important;
    "?gd=0", which Python reads and uses to close the drawer — this is what makes
    "click outside to close" actually work, on top of the × and the header toggle. */
 a.drawer-scrim { position:fixed; inset:0; background:rgba(5,4,10,0.55); backdrop-filter:blur(3px);
-                z-index:998; animation:fadeIn .35s ease both; display:block; cursor:pointer; }
+                 z-index:998; animation:fadeIn .35s ease both; display:block; cursor:pointer;
+                 pointer-events:auto; }
 .drawer {
     position:fixed; top:0; right:0; height:100vh; width:min(420px, 92vw); z-index:999;
     background:linear-gradient(180deg, rgba(20,10,24,0.94), rgba(8,6,13,0.96));
     border-left:1px solid rgba(255,105,150,0.20); backdrop-filter:blur(22px);
-    padding:46px 34px; overflow-y:auto; box-shadow:-30px 0 70px rgba(0,0,0,0.55);
+    padding:46px 34px; overflow-y:auto; overscroll-behavior:contain;
+    box-shadow:-30px 0 70px rgba(0,0,0,0.55); isolation:isolate;
     animation:drawerIn .55s cubic-bezier(.2,.8,.3,1) both;
     border-radius:28px 0 0 28px;
 }
@@ -901,6 +934,7 @@ a.drawer-scrim { position:fixed; inset:0; background:rgba(5,4,10,0.55); backdrop
     text-decoration:none; border:1px solid rgba(255,105,150,0.35);
     background:rgba(255,79,135,0.10); transition:background .3s ease, transform .3s ease; }
 .drawer-close:hover { background:rgba(255,79,135,0.22); transform:rotate(90deg); }
+.drawer-close:focus-visible { outline:2px solid var(--orange-3); outline-offset:4px; }
 .g-row { display:flex; gap:18px; align-items:flex-start; padding:16px 0;
          border-bottom:1px solid rgba(255,255,255,0.05); }
 .g-num { flex:none; width:38px; height:38px; border-radius:50%; display:flex; align-items:center;
@@ -1112,7 +1146,7 @@ NAV_BAR = """
     <div class="nav-links">
         <span>Home</span><span>Predict</span><span>Explore</span><span>Insights</span><span>About</span>
     </div>
-    <div class="nav-cta">Get started →</div>
+    <div class="nav-cta">Get started</div>
 </div>
 """
 
@@ -1142,24 +1176,62 @@ def guidelines_drawer():
         for n, t in GUIDELINES_STEPS
     )
     return f"""
-    <a href="?gd=0" target="_self" class="drawer-scrim" aria-label="Close guidelines"></a>
-    <div class="drawer">
+    <a href="?gd=0" target="_self" class="drawer-scrim" aria-label="Close Guidelines"></a>
+    <div class="drawer" role="dialog" aria-modal="true" aria-labelledby="guidelines-title">
         <div class="drawer-head">
             <div>
-                <span class="eyebrow">📖 Guidelines</span>
-                <h3>How this works</h3>
+                <span class="eyebrow">Guidelines</span>
+                <h3 id="guidelines-title">How this works</h3>
             </div>
-            <a href="?gd=0" target="_self" class="drawer-close" aria-label="Close guidelines">×</a>
+            <a href="?gd=0" target="_self" class="drawer-close" aria-label="Close Guidelines">×</a>
         </div>
         {rows}
         <div class="g-tip">
             <span class="eyebrow">Tip</span>
             <div class="g-txt" style="padding-top:8px;">
-                You can close this guide anytime using the X button or Guidelines button.
+                Close this guide with the × button, the Guidelines control, or Escape.
             </div>
         </div>
     </div>
     """
+
+
+def guidelines_keyboard_bridge():
+    """Let Escape close the custom drawer without leaving a stale scrim behind.
+
+    Streamlit renders the drawer as HTML, so the key listener lives in a tiny
+    same-page component and navigates through the same `gd=0` close path as the
+    visible X and scrim. The listener is removed when the component is replaced
+    on the next rerun.
+    """
+    components.html(
+        """
+        <script>
+        (() => {
+            try {
+                const parentWindow = window.parent;
+                const parentDocument = parentWindow.document;
+                const closeGuidelines = (event) => {
+                    if (event.key !== "Escape") return;
+                    event.preventDefault();
+                    const url = new URL(parentWindow.location.href);
+                    url.searchParams.set("gd", "0");
+                    parentWindow.location.assign(url.toString());
+                };
+                parentDocument.addEventListener("keydown", closeGuidelines);
+                window.addEventListener("unload", () => {
+                    parentDocument.removeEventListener("keydown", closeGuidelines);
+                });
+            } catch (error) {
+                // Cross-origin component sandboxes may not expose the parent
+                // document; the visible X and scrim remain fully functional.
+            }
+        })();
+        </script>
+        """,
+        height=0,
+        scrolling=False,
+    )
 
 
 def result_panel(verdict, sub, pct):
@@ -1215,15 +1287,14 @@ def main():
             st.session_state[key] = default
 
     # ---- guidelines: close via query-param ----
-    # A plain <a href="?gd=0"> inside the drawer (scrim + × button) triggers a normal
-    # Streamlit rerun with a query param, which we consume here. This is what makes
-    # "click outside" / the × button actually close the drawer, instead of relying only
-    # on the header toggle button (whose click could previously be swallowed by the
-    # fixed-position scrim sitting visually on top of it).
+    # The scrim and × button are regular same-page links. They trigger a clean
+    # Streamlit rerun, and this branch removes only the drawer flag before the
+    # rest of the page is rendered. This prevents a stale fixed scrim from
+    # surviving in the DOM and blocking pointer events after close.
     try:
         if st.query_params.get("gd") == "0":
             st.session_state.show_guidelines = False
-            st.query_params.clear()
+            del st.query_params["gd"]
     except Exception:
         pass
 
@@ -1263,12 +1334,13 @@ def main():
     with nav_col:
         st.markdown(NAV_BAR, unsafe_allow_html=True)
     with g_col:
-        g_label = "📖 Guidelines ×" if st.session_state.show_guidelines else "📖 Guidelines"
+        g_label = "Guidelines ×" if st.session_state.show_guidelines else "Guidelines"
         if st.button(g_label, key="guidelines_toggle", use_container_width=True):
             st.session_state.show_guidelines = not st.session_state.show_guidelines
             st.rerun()
 
     if st.session_state.show_guidelines:
+        guidelines_keyboard_bridge()
         st.markdown(guidelines_drawer(), unsafe_allow_html=True)
 
     # Check if data is already in the database
@@ -1291,7 +1363,7 @@ def main():
             </div>
             """, unsafe_allow_html=True)
             st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
-            if st.button("Try prediction →", key="hero_cta", type="primary"):
+            if st.button("Try prediction", key="hero_cta", type="primary"):
                 st.session_state.show_guidelines = True
                 st.rerun()
 
@@ -1365,7 +1437,7 @@ def main():
                     st.session_state.show_analysis = False
                     st.rerun()
             else:
-                if st.button("⚡ Use sample NPI data", key="use_sample_npi",
+                if st.button("Use sample NPI data", key="use_sample_npi",
                              type="primary", use_container_width=True):
                     with st.spinner("Loading sample signals..."):
                         try:
@@ -1440,7 +1512,7 @@ def main():
                     st.session_state.show_analysis = False
                     st.rerun()
             else:
-                if st.button("⚡ Use sample survey data", key="use_sample_survey",
+                if st.button("Use sample survey data", key="use_sample_survey",
                              type="primary", use_container_width=True):
                     with st.spinner("Loading sample signals..."):
                         try:
@@ -1620,7 +1692,7 @@ def main():
             time_str = st.text_input("Analysis time (HH:MM)", value="00:30", key="time_input")
         with i3:
             st.markdown("<div style='height:26px;'></div>", unsafe_allow_html=True)
-            run_button = st.button("Predict now →", key="run_button", type="primary",
+            run_button = st.button("Predict now", key="run_button", type="primary",
                                    help="Run the analysis")
         st.markdown('</div>', unsafe_allow_html=True)
 
