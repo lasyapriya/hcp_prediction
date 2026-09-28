@@ -1,5 +1,3 @@
-# https://hcpprediction-zeptonaiml.streamlit.app/
-
 import streamlit as st
 import requests
 import time
@@ -668,6 +666,43 @@ html, body, [class*="css"], p, li, span, label,
 div[data-testid="stMarkdownContainer"] { font-family:var(--sans); color:var(--text-2); }
 
 .bio-field { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+.bio-flower {
+    position:absolute; width:min(94vw, 1240px); height:min(98vh, 980px);
+    top:-5vh; right:-10vw; overflow:visible; opacity:0.92;
+    filter:drop-shadow(0 0 24px rgba(255,79,135,0.20));
+    transform-origin:62% 48%; animation:flowerOrbit 48s ease-in-out infinite;
+}
+.bio-flower .petal {
+    fill:url(#petalPink); stroke:url(#petalEdge); stroke-width:1.25;
+    stroke-linejoin:round; opacity:0.48; filter:url(#petalGlow);
+    transform-box:fill-box; transform-origin:center;
+}
+.bio-flower .petal.alt { fill:url(#petalPurple); opacity:0.38; }
+.bio-flower .petal.warm { fill:url(#petalWarm); opacity:0.44; }
+.bio-flower .petal-edge {
+    fill:none; stroke:url(#petalEdge); stroke-width:2.2; opacity:0.78;
+    stroke-linecap:round; filter:url(#lineGlow);
+}
+.bio-flower .filament {
+    fill:none; stroke:url(#filament); stroke-width:1.05; opacity:0.52;
+    stroke-linecap:round; stroke-dasharray:4 12;
+    animation:filamentFlow 12s linear infinite;
+}
+.bio-flower .filament:nth-of-type(2n) { animation-duration:17s; animation-direction:reverse; }
+.bio-flower .spark { fill:#FFD9B9; filter:url(#sparkGlow); }
+.bio-flower .core-ring {
+    fill:none; stroke:url(#coreRing); stroke-linecap:round;
+    opacity:0.66; transform-origin:center; animation:corePulse 9s ease-in-out infinite;
+}
+@keyframes flowerOrbit {
+    0%,100% { transform:rotate(-3deg) scale(0.98) translate3d(0,0,0); }
+    50% { transform:rotate(4deg) scale(1.04) translate3d(-18px,18px,0); }
+}
+@keyframes filamentFlow { to { stroke-dashoffset:-160; } }
+@keyframes corePulse {
+    0%,100% { opacity:0.38; transform:scale(0.94); }
+    50% { opacity:0.9; transform:scale(1.08); }
+}
 .bio-field::before {
     content:""; position:absolute; width:min(68vw, 980px); aspect-ratio:1;
     top:-15%; right:-13%; border-radius:50%;
@@ -829,6 +864,94 @@ h4 { font-size:24px !important; }
 .data-card { border-radius:var(--r-lg); padding:30px 32px 32px; margin-bottom:22px; min-height:260px; }
 .data-card::before { content:""; position:absolute; inset:-1px; border-radius:inherit; pointer-events:none;
         background:radial-gradient(360px 160px at 100% 0%, rgba(255,79,135,0.12), transparent 70%); }
+.data-card::after { content:""; position:absolute; width:240px; height:180px; right:-86px; bottom:-94px;
+         border-radius:50%; background:radial-gradient(circle, rgba(255,105,150,0.26), transparent 68%);
+         filter:blur(14px); pointer-events:none; transition:transform .45s ease, opacity .45s ease; }
+.npi-card {
+    min-height:360px; padding:38px 38px 40px;
+    border-radius:50px 22px 52px 26px;
+    background:
+        radial-gradient(460px 220px at 16% 0%, rgba(255,79,135,0.15), transparent 72%),
+        linear-gradient(145deg, rgba(30,12,32,0.70), rgba(14,8,24,0.48));
+    box-shadow:0 24px 64px rgba(0,0,0,0.46), 0 0 38px rgba(255,79,135,0.10);
+    transform:translateY(-10px);
+}
+.survey-card {
+    min-height:326px; padding:34px 34px 36px;
+    border-radius:28px 58px 24px 50px;
+    background:
+        radial-gradient(420px 220px at 86% 8%, rgba(139,77,255,0.18), transparent 72%),
+        linear-gradient(225deg, rgba(22,12,38,0.68), rgba(12,8,22,0.50));
+    box-shadow:0 24px 64px rgba(0,0,0,0.46), 0 0 38px rgba(139,77,255,0.10);
+    transform:translateY(18px);
+}
+.npi-card:hover { transform:translateY(-17px); border-color:rgba(255,135,170,0.56); }
+.survey-card:hover { transform:translateY(10px); border-color:rgba(184,150,255,0.52); }
+.data-card:hover::after { transform:scale(1.24); opacity:1.18; }
+.data-orb {
+    width:58px; height:58px; display:flex; align-items:center; justify-content:center;
+    margin:0 0 18px; border-radius:22px 14px 24px 12px;
+    border:1px solid rgba(255,120,164,0.38);
+    background:radial-gradient(circle at 35% 25%, rgba(255,176,138,0.28), rgba(255,79,135,0.08) 52%, rgba(139,77,255,0.08));
+    box-shadow:0 0 24px rgba(255,79,135,0.20), inset 0 0 20px rgba(255,176,138,0.10);
+    transition:transform .4s ease, box-shadow .4s ease;
+}
+.survey-card .data-orb { border-radius:16px 26px 14px 24px; border-color:rgba(173,135,255,0.40);
+    background:radial-gradient(circle at 35% 25%, rgba(166,108,255,0.30), rgba(139,77,255,0.08) 56%, rgba(255,79,135,0.06)); }
+.data-orb svg { width:30px; height:30px; stroke:var(--orange-3); filter:drop-shadow(0 0 7px rgba(255,111,157,0.72)); }
+.survey-card .data-orb svg { stroke:var(--purple-2); }
+.data-card:hover .data-orb { transform:translateY(-3px) rotate(-4deg) scale(1.06);
+    box-shadow:0 0 32px rgba(255,79,135,0.32), inset 0 0 24px rgba(255,176,138,0.16); }
+.npi-card .data-card-h, .survey-card .data-card-h { font-size:44px; line-height:1.02; margin-top:0; }
+.npi-card .sec-d, .survey-card .sec-d { max-width:360px; margin-top:14px; margin-bottom:28px; }
+.npi-card .stButton > button, .survey-card .stButton > button,
+.npi-card .stDownloadButton > button, .survey-card .stDownloadButton > button {
+    min-height:56px !important; padding:16px 26px !important; font-size:14px !important;
+}
+/* Streamlit renders widgets as sibling blocks to the HTML marker above. Use
+   the marker to style the whole column so the functional uploaders and buttons
+   live inside the same visual object, not in a separate rectangle. */
+div[data-testid="column"]:has(.npi-card),
+div[data-testid="column"]:has(.survey-card) {
+    position:relative; overflow:visible; padding:34px 34px 30px;
+    border:1px solid rgba(255,105,150,0.22); backdrop-filter:blur(18px);
+    transition:transform .45s ease, border-color .45s ease, box-shadow .45s ease;
+}
+div[data-testid="column"]:has(.npi-card) {
+    min-height:360px; border-radius:50px 22px 52px 26px;
+    background:
+        radial-gradient(460px 220px at 16% 0%, rgba(255,79,135,0.15), transparent 72%),
+        linear-gradient(145deg, rgba(30,12,32,0.70), rgba(14,8,24,0.48));
+    box-shadow:0 24px 64px rgba(0,0,0,0.46), 0 0 38px rgba(255,79,135,0.10);
+    transform:translateY(-10px);
+}
+div[data-testid="column"]:has(.survey-card) {
+    min-height:326px; border-radius:28px 58px 24px 50px;
+    background:
+        radial-gradient(420px 220px at 86% 8%, rgba(139,77,255,0.18), transparent 72%),
+        linear-gradient(225deg, rgba(22,12,38,0.68), rgba(12,8,22,0.50));
+    box-shadow:0 24px 64px rgba(0,0,0,0.46), 0 0 38px rgba(139,77,255,0.10);
+    transform:translateY(18px);
+}
+div[data-testid="column"]:has(.npi-card):hover {
+    transform:translateY(-17px); border-color:rgba(255,135,170,0.56);
+    box-shadow:0 30px 74px rgba(0,0,0,0.52), 0 0 46px rgba(255,79,135,0.18);
+}
+div[data-testid="column"]:has(.survey-card):hover {
+    transform:translateY(10px); border-color:rgba(184,150,255,0.52);
+    box-shadow:0 30px 74px rgba(0,0,0,0.52), 0 0 46px rgba(139,77,255,0.18);
+}
+.npi-card, .survey-card {
+    min-height:0; padding:0; border:0; background:transparent; box-shadow:none;
+    transform:none; overflow:visible;
+}
+.npi-card::before, .npi-card::after, .survey-card::before, .survey-card::after { display:none; }
+div[data-testid="column"]:has(.npi-card) .stButton > button,
+div[data-testid="column"]:has(.survey-card) .stButton > button,
+div[data-testid="column"]:has(.npi-card) .stDownloadButton > button,
+div[data-testid="column"]:has(.survey-card) .stDownloadButton > button {
+    min-height:56px !important; padding:16px 26px !important; font-size:14px !important;
+}
 
 /* ---------- 06 · BUTTONS ---------- */
 /* Larger, premium pill buttons: bigger type, taller hit area, hover lift + glow +
@@ -947,6 +1070,32 @@ a.drawer-scrim { position:fixed; inset:0; background:rgba(5,4,10,0.55); backdrop
 .g-txt { font-family:var(--sans); font-size:17px; line-height:1.6; color:var(--text-2); padding-top:6px; }
 .g-tip { margin-top:28px; padding:20px 22px; border-radius:var(--r-md);
          border:1px solid rgba(166,108,255,0.22); background:rgba(139,77,255,0.08); }
+.guidelines-dialog-content h3 { font-family:var(--serif) !important; font-size:40px !important;
+    line-height:1.05; font-weight:400 !important; color:var(--text) !important;
+    margin:10px 0 24px; }
+div[data-testid="stDialog"] > div:first-child,
+div[role="dialog"] {
+    background:
+        radial-gradient(520px 300px at 8% 0%, rgba(255,79,135,0.14), transparent 72%),
+        linear-gradient(180deg, rgba(20,10,28,0.97), rgba(8,6,13,0.98)) !important;
+    border:1px solid rgba(255,105,150,0.28) !important;
+    border-radius:30px 0 0 30px !important;
+    box-shadow:-28px 0 80px rgba(0,0,0,0.62), 0 0 34px rgba(255,79,135,0.12) !important;
+    backdrop-filter:blur(24px);
+}
+div[data-testid="stDialog"] [data-testid="stMarkdownContainer"],
+div[role="dialog"] [data-testid="stMarkdownContainer"] { color:var(--text-2) !important; }
+div[data-testid="stDialog"] button[aria-label*="Close"],
+div[role="dialog"] button[aria-label*="Close"] {
+    width:44px !important; height:44px !important; border-radius:50% !important;
+    color:var(--text) !important; border:1px solid rgba(255,105,150,0.42) !important;
+    background:rgba(255,79,135,0.12) !important;
+}
+div[data-testid="stDialog"] button[aria-label*="Close"]:hover,
+div[role="dialog"] button[aria-label*="Close"]:hover {
+    color:#fff !important; background:rgba(255,79,135,0.26) !important;
+    box-shadow:0 0 24px rgba(255,79,135,0.26) !important;
+}
 
 /* ---------- 10 · NAV RAIL ---------- */
 section[data-testid="stSidebar"] {
@@ -1003,13 +1152,144 @@ section[data-testid="stSidebar"] * { color:var(--text-2); font-family:var(--sans
     .metrics-grid { grid-template-columns:1fr 1fr; gap:12px; }
     .metric { padding:18px 20px 16px 22px; }
     .metric .val { font-size:36px; }
+    .bio-flower { width:125vw; height:88vh; right:-42vw; top:4vh; opacity:0.72; }
+    .npi-card, .survey-card,
+    div[data-testid="column"]:has(.npi-card),
+    div[data-testid="column"]:has(.survey-card) { transform:none; }
+    div[data-testid="column"]:has(.npi-card):hover,
+    div[data-testid="column"]:has(.survey-card):hover { transform:translateY(-6px); }
+    .npi-card .data-card-h, .survey-card .data-card-h { font-size:38px; }
 }
 @media (max-width: 560px) {
     .metrics-grid { grid-template-columns:1fr; }
+    div[data-testid="column"]:has(.npi-card),
+    div[data-testid="column"]:has(.survey-card) { padding:28px 24px 30px; }
+    .data-orb { width:52px; height:52px; }
 }
 </style>
 
 <div class="bio-field">
+    <svg class="bio-flower" viewBox="0 0 1200 950" aria-hidden="true">
+        <defs>
+            <radialGradient id="flowerCore" cx="50%" cy="50%">
+                <stop offset="0%" stop-color="#FFF8D9"/>
+                <stop offset="7%" stop-color="#FFD2A5"/>
+                <stop offset="22%" stop-color="#FF8A65" stop-opacity=".96"/>
+                <stop offset="48%" stop-color="#FF4F87" stop-opacity=".48"/>
+                <stop offset="100%" stop-color="#8B4DFF" stop-opacity="0"/>
+            </radialGradient>
+            <linearGradient id="petalPink" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#8B4DFF" stop-opacity=".10"/>
+                <stop offset="35%" stop-color="#FF4F87" stop-opacity=".55"/>
+                <stop offset="68%" stop-color="#FF8A65" stop-opacity=".30"/>
+                <stop offset="100%" stop-color="#FFB08A" stop-opacity=".04"/>
+            </linearGradient>
+            <linearGradient id="petalPurple" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#A66CFF" stop-opacity=".44"/>
+                <stop offset="42%" stop-color="#FF4F87" stop-opacity=".32"/>
+                <stop offset="100%" stop-color="#FF9E78" stop-opacity=".03"/>
+            </linearGradient>
+            <linearGradient id="petalWarm" x1="50%" y1="100%" x2="50%" y2="0%">
+                <stop offset="0%" stop-color="#FF5C8A" stop-opacity=".10"/>
+                <stop offset="48%" stop-color="#FF9E78" stop-opacity=".48"/>
+                <stop offset="84%" stop-color="#FFD2A5" stop-opacity=".08"/>
+                <stop offset="100%" stop-color="#FFB08A" stop-opacity="0"/>
+            </linearGradient>
+            <linearGradient id="petalEdge" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#8B4DFF" stop-opacity=".32"/>
+                <stop offset="38%" stop-color="#FF4F87"/>
+                <stop offset="72%" stop-color="#FFB08A"/>
+                <stop offset="100%" stop-color="#FFF0D0" stop-opacity=".46"/>
+            </linearGradient>
+            <linearGradient id="filament" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#A66CFF" stop-opacity=".08"/>
+                <stop offset="45%" stop-color="#FF6F9D" stop-opacity=".92"/>
+                <stop offset="75%" stop-color="#FFB08A" stop-opacity=".76"/>
+                <stop offset="100%" stop-color="#A66CFF" stop-opacity=".08"/>
+            </linearGradient>
+            <linearGradient id="coreRing" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#FFF8D9" stop-opacity=".18"/>
+                <stop offset="45%" stop-color="#FF8A65"/>
+                <stop offset="100%" stop-color="#A66CFF" stop-opacity=".15"/>
+            </linearGradient>
+            <filter id="petalGlow" x="-35%" y="-35%" width="170%" height="170%">
+                <feGaussianBlur stdDeviation="7" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <filter id="lineGlow" x="-40%" y="-40%" width="180%" height="180%">
+                <feGaussianBlur stdDeviation="2.6" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <filter id="coreGlow" x="-250%" y="-250%" width="600%" height="600%">
+                <feGaussianBlur stdDeviation="16" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <filter id="sparkGlow" x="-300%" y="-300%" width="700%" height="700%">
+                <feGaussianBlur stdDeviation="3" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+        </defs>
+
+        <g transform="translate(70 10)">
+            <g class="flower-petals">
+                <path class="petal warm" d="M585 462 C520 390 458 278 500 150 C530 65 594 32 630 0 C655 122 725 235 682 342 C655 407 622 446 585 462Z"/>
+                <path class="petal alt" d="M585 462 C482 456 355 430 284 326 C236 255 258 180 247 124 C354 170 492 156 560 249 C602 307 601 394 585 462Z"/>
+                <path class="petal" d="M585 462 C467 502 347 570 244 518 C168 479 146 406 102 370 C224 340 351 278 470 330 C536 358 566 416 585 462Z"/>
+                <path class="petal alt" d="M585 462 C522 538 459 658 342 708 C258 744 202 703 140 716 C190 602 203 474 309 425 C410 380 512 420 585 462Z"/>
+                <path class="petal warm" d="M585 462 C620 552 658 684 756 748 C826 794 896 764 958 790 C897 670 900 532 797 473 C716 426 634 438 585 462Z"/>
+                <path class="petal" d="M585 462 C694 470 820 446 918 356 C980 299 974 226 1016 174 C894 186 762 149 672 238 C616 293 592 397 585 462Z"/>
+                <path class="petal alt" d="M585 462 C662 385 744 270 727 148 C716 67 660 26 650 -36 C578 75 477 145 492 267 C501 349 548 424 585 462Z"/>
+                <path class="petal warm" d="M585 462 C634 403 742 350 847 386 C923 412 950 469 1008 500 C904 548 810 633 703 600 C632 578 599 514 585 462Z"/>
+            </g>
+
+            <g class="petal-edges">
+                <path class="petal-edge" d="M585 462 C520 390 458 278 500 150 C530 65 594 32 630 0 C655 122 725 235 682 342 C655 407 622 446 585 462Z"/>
+                <path class="petal-edge" d="M585 462 C482 456 355 430 284 326 C236 255 258 180 247 124 C354 170 492 156 560 249 C602 307 601 394 585 462Z"/>
+                <path class="petal-edge" d="M585 462 C467 502 347 570 244 518 C168 479 146 406 102 370 C224 340 351 278 470 330 C536 358 566 416 585 462Z"/>
+                <path class="petal-edge" d="M585 462 C522 538 459 658 342 708 C258 744 202 703 140 716 C190 602 203 474 309 425 C410 380 512 420 585 462Z"/>
+                <path class="petal-edge" d="M585 462 C620 552 658 684 756 748 C826 794 896 764 958 790 C897 670 900 532 797 473 C716 426 634 438 585 462Z"/>
+                <path class="petal-edge" d="M585 462 C694 470 820 446 918 356 C980 299 974 226 1016 174 C894 186 762 149 672 238 C616 293 592 397 585 462Z"/>
+                <path class="petal-edge" d="M585 462 C662 385 744 270 727 148 C716 67 660 26 650 -36 C578 75 477 145 492 267 C501 349 548 424 585 462Z"/>
+                <path class="petal-edge" d="M585 462 C634 403 742 350 847 386 C923 412 950 469 1008 500 C904 548 810 633 703 600 C632 578 599 514 585 462Z"/>
+            </g>
+
+            <g class="filaments">
+                <path class="filament" d="M585 462 C536 378 502 259 554 120 C576 69 607 42 625 14"/>
+                <path class="filament" d="M585 462 C470 443 357 398 288 300 C265 267 257 222 252 160"/>
+                <path class="filament" d="M585 462 C468 501 356 532 248 488 C208 472 176 430 126 390"/>
+                <path class="filament" d="M585 462 C531 546 456 640 357 686 C286 717 231 697 170 700"/>
+                <path class="filament" d="M585 462 C641 555 697 667 777 722 C839 764 894 766 946 779"/>
+                <path class="filament" d="M585 462 C698 466 816 422 902 347 C950 304 973 247 1002 194"/>
+                <path class="filament" d="M585 462 C649 376 708 266 710 162 C708 91 674 46 657 -10"/>
+                <path class="filament" d="M585 462 C681 412 774 369 851 401 C908 424 955 467 990 493"/>
+                <path class="filament" d="M585 462 C484 390 412 309 367 202 C343 146 340 90 347 38"/>
+                <path class="filament" d="M585 462 C720 526 827 585 931 606 C1003 620 1060 595 1116 570"/>
+            </g>
+
+            <g opacity=".8">
+                <circle class="core-ring" cx="585" cy="462" r="68" stroke-width="2"/>
+                <circle class="core-ring" cx="585" cy="462" r="104" stroke-width="1.2" stroke-dasharray="3 16"/>
+                <circle class="core-ring" cx="585" cy="462" r="150" stroke-width=".8" stroke-dasharray="2 22"/>
+            </g>
+            <circle cx="585" cy="462" r="152" fill="url(#flowerCore)" filter="url(#coreGlow)">
+                <animate attributeName="r" values="136;158;136" dur="10s" repeatCount="indefinite"/>
+                <animate attributeName="opacity" values=".72;1;.72" dur="10s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="585" cy="462" r="18" fill="#FFF6D2" filter="url(#sparkGlow)">
+                <animate attributeName="r" values="13;21;13" dur="5s" repeatCount="indefinite"/>
+            </circle>
+            <g class="flower-sparks">
+                <circle class="spark" cx="425" cy="164" r="4"><animate attributeName="opacity" values=".15;1;.15" dur="6s" repeatCount="indefinite"/></circle>
+                <circle class="spark" cx="298" cy="420" r="3"><animate attributeName="opacity" values=".1;.8;.1" dur="9s" repeatCount="indefinite"/></circle>
+                <circle class="spark" cx="406" cy="684" r="2.5"><animate attributeName="opacity" values=".2;1;.2" dur="7s" repeatCount="indefinite"/></circle>
+                <circle class="spark" cx="770" cy="690" r="4"><animate attributeName="opacity" values=".12;.9;.12" dur="11s" repeatCount="indefinite"/></circle>
+                <circle class="spark" cx="932" cy="278" r="3.5"><animate attributeName="opacity" values=".1;1;.1" dur="8s" repeatCount="indefinite"/></circle>
+                <circle class="spark" cx="842" cy="523" r="2.6"><animate attributeName="opacity" values=".18;.9;.18" dur="10s" repeatCount="indefinite"/></circle>
+                <circle class="spark" cx="530" cy="86" r="2.4"><animate attributeName="opacity" values=".1;.8;.1" dur="12s" repeatCount="indefinite"/></circle>
+                <circle class="spark" cx="208" cy="250" r="2"><animate attributeName="opacity" values=".14;.75;.14" dur="13s" repeatCount="indefinite"/></circle>
+            </g>
+        </g>
+    </svg>
     <div class="bio-blob b1"></div><div class="bio-blob b2"></div><div class="bio-blob b3"></div>
     <div class="bio-blob b4"></div><div class="bio-blob b5"></div>
     <div class="mote m1"></div><div class="mote m2"></div><div class="mote m3"></div>
@@ -1172,68 +1452,37 @@ GUIDELINES_STEPS = [
 ]
 
 
-def guidelines_drawer():
+def guidelines_dialog():
+    """Open Guidelines as a native Streamlit dialog.
+
+    Unlike a query-string anchor, the native dialog closes in the browser
+    without navigating the app. Its close button and Escape handling therefore
+    leave the current page, inputs, loaded data, and scroll context untouched.
+    """
     rows = "".join(
         f'<div class="g-row"><div class="g-num">{n}</div><div class="g-txt">{t}</div></div>'
         for n, t in GUIDELINES_STEPS
     )
-    return f"""
-    <a href="?gd=0" target="_self" class="drawer-scrim" aria-label="Close Guidelines"></a>
-    <div class="drawer" role="dialog" aria-modal="true" aria-labelledby="guidelines-title">
-        <div class="drawer-head">
-            <div>
+    @st.dialog("Guidelines", width="small")
+    def _render():
+        st.markdown(
+            f"""
+            <div class="guidelines-dialog-content">
                 <span class="eyebrow">Guidelines</span>
-                <h3 id="guidelines-title">How this works</h3>
+                <h3>How this works</h3>
+                {rows}
+                <div class="g-tip">
+                    <span class="eyebrow">Tip</span>
+                    <div class="g-txt" style="padding-top:8px;">
+                        Close this guide with the × button or Escape. Your current
+                        page, inputs, and loaded data stay in place.
+                    </div>
+                </div>
             </div>
-            <a href="?gd=0" target="_self" class="drawer-close" aria-label="Close Guidelines">×</a>
-        </div>
-        {rows}
-        <div class="g-tip">
-            <span class="eyebrow">Tip</span>
-            <div class="g-txt" style="padding-top:8px;">
-                Close this guide with the × button, the Guidelines control, or Escape.
-            </div>
-        </div>
-    </div>
-    """
-
-
-def guidelines_keyboard_bridge():
-    """Let Escape close the custom drawer without leaving a stale scrim behind.
-
-    Streamlit renders the drawer as HTML, so the key listener lives in a tiny
-    same-page component and navigates through the same `gd=0` close path as the
-    visible X and scrim. The listener is removed when the component is replaced
-    on the next rerun.
-    """
-    components.html(
-        """
-        <script>
-        (() => {
-            try {
-                const parentWindow = window.parent;
-                const parentDocument = parentWindow.document;
-                const closeGuidelines = (event) => {
-                    if (event.key !== "Escape") return;
-                    event.preventDefault();
-                    const url = new URL(parentWindow.location.href);
-                    url.searchParams.set("gd", "0");
-                    parentWindow.location.assign(url.toString());
-                };
-                parentDocument.addEventListener("keydown", closeGuidelines);
-                window.addEventListener("unload", () => {
-                    parentDocument.removeEventListener("keydown", closeGuidelines);
-                });
-            } catch (error) {
-                // Cross-origin component sandboxes may not expose the parent
-                // document; the visible X and scrim remain fully functional.
-            }
-        })();
-        </script>
-        """,
-        height=0,
-        scrolling=False,
-    )
+            """,
+            unsafe_allow_html=True,
+        )
+    _render()
 
 
 def result_panel(verdict, sub, pct):
@@ -1283,22 +1532,10 @@ def main():
         ('initial_load', True), ('show_gif', False), ('show_transition', False),
         ('show_analysis', False), ('slideshow_completed', False), ('npi_file', None),
         ('survey_file', None), ('npi_df', None), ('survey_df', None),
-        ('rf_model', None), ('model_accuracy', None), ('show_guidelines', False),
+        ('rf_model', None), ('model_accuracy', None),
     ]:
         if key not in st.session_state:
             st.session_state[key] = default
-
-    # ---- guidelines: close via query-param ----
-    # The scrim and × button are regular same-page links. They trigger a clean
-    # Streamlit rerun, and this branch removes only the drawer flag before the
-    # rest of the page is rendered. This prevents a stale fixed scrim from
-    # surviving in the DOM and blocking pointer events after close.
-    try:
-        if st.query_params.get("gd") == "0":
-            st.session_state.show_guidelines = False
-            del st.query_params["gd"]
-    except Exception:
-        pass
 
     # ---- opening sequence (~3s) ----
     if st.session_state.initial_load:
@@ -1327,23 +1564,12 @@ def main():
         )
 
     # ---- header: nav + guidelines toggle ----
-    # The anchor below gives the following row (nav + toggle button) its own stacking
-    # context above the drawer/scrim (see CSS "#topbar-anchor + div"), so the toggle
-    # button stays clickable even while the drawer is open — a second, always-working
-    # way to close Guidelines in addition to the × and click-outside.
-    st.markdown('<div id="topbar-anchor"></div>', unsafe_allow_html=True)
     nav_col, g_col = st.columns([5, 1])
     with nav_col:
         st.markdown(NAV_BAR, unsafe_allow_html=True)
     with g_col:
-        g_label = "Guidelines ×" if st.session_state.show_guidelines else "Guidelines"
-        if st.button(g_label, key="guidelines_toggle", use_container_width=True):
-            st.session_state.show_guidelines = not st.session_state.show_guidelines
-            st.rerun()
-
-    if st.session_state.show_guidelines:
-        guidelines_keyboard_bridge()
-        st.markdown(guidelines_drawer(), unsafe_allow_html=True)
+        if st.button("Guidelines", key="guidelines_toggle", use_container_width=True):
+            guidelines_dialog()
 
     # Check if data is already in the database
     data_status = check_data_status()
@@ -1366,8 +1592,7 @@ def main():
             """, unsafe_allow_html=True)
             st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
             if st.button("Try prediction", key="hero_cta", type="primary"):
-                st.session_state.show_guidelines = True
-                st.rerun()
+                guidelines_dialog()
 
         with hero_right:
             st.markdown(HERO_ORGANISM, unsafe_allow_html=True)
@@ -1419,10 +1644,15 @@ def main():
 
         # ---------------- NPI ----------------
         with npi_col:
-            st.markdown('<div class="data-card rise">', unsafe_allow_html=True)
+            st.markdown('<div class="data-card npi-card rise">', unsafe_allow_html=True)
             st.markdown(
+                '<div class="data-orb" aria-hidden="true">'
+                '<svg viewBox="0 0 32 32" fill="none">'
+                '<path d="M7 13.5a5.5 5.5 0 1 1 11 0 5.5 5.5 0 0 1-11 0Z" stroke-width="1.8"/>'
+                '<path d="M4.5 27c.6-4.3 3.1-6.4 7.5-6.4s6.9 2.1 7.5 6.4M20 10.5a4.1 4.1 0 1 1 3.6 6.1M22.2 20.8c2.9.3 4.6 2.1 5.2 5.4" stroke-width="1.8" stroke-linecap="round"/>'
+                '</svg></div>'
                 '<span class="eyebrow">Source 01</span>'
-                '<div class="data-card-h">NPI Data</div>'
+                '<div class="data-card-h">NPI Intelligence</div>'
                 '<div class="sec-d">Login windows, usage time, region and specialty signals.</div>',
                 unsafe_allow_html=True
             )
@@ -1494,10 +1724,16 @@ def main():
 
         # ---------------- SURVEY ----------------
         with survey_col:
-            st.markdown('<div class="data-card rise-2">', unsafe_allow_html=True)
+            st.markdown('<div class="data-card survey-card rise-2">', unsafe_allow_html=True)
             st.markdown(
+                '<div class="data-orb" aria-hidden="true">'
+                '<svg viewBox="0 0 32 32" fill="none">'
+                '<path d="M5 17.5h4l2.2-6.5 4.2 12 2.4-6.3H27" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>'
+                '<circle cx="5" cy="17.5" r="1.5" fill="currentColor" stroke="none"/>'
+                '<circle cx="27" cy="17.5" r="1.5" fill="currentColor" stroke="none"/>'
+                '</svg></div>'
                 '<span class="eyebrow">Source 02</span>'
-                '<div class="data-card-h">Survey Data</div>'
+                '<div class="data-card-h">Survey Intelligence</div>'
                 '<div class="sec-d">Recorded survey attempts, by NPI and time of attempt.</div>',
                 unsafe_allow_html=True
             )
