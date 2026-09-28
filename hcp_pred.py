@@ -1463,7 +1463,17 @@ def guidelines_dialog():
         f'<div class="g-row"><div class="g-num">{n}</div><div class="g-txt">{t}</div></div>'
         for n, t in GUIDELINES_STEPS
     )
-    @st.dialog("Guidelines", width="small")
+
+    # `st.dialog` is the stable API in newer Streamlit releases, while older
+    # Community Cloud runtimes expose the same feature as
+    # `st.experimental_dialog`. Resolve the available decorator at runtime so
+    # an otherwise valid app does not fail during the first button interaction.
+    dialog_decorator = getattr(st, "dialog", None) or getattr(st, "experimental_dialog", None)
+    if dialog_decorator is None:
+        st.session_state.show_guidelines = True
+        return False
+
+    @dialog_decorator("Guidelines", width="small")
     def _render():
         st.markdown(
             f"""
@@ -1483,6 +1493,27 @@ def guidelines_dialog():
             unsafe_allow_html=True,
         )
     _render()
+    return True
+
+
+def render_guidelines_fallback():
+    """Fallback for Streamlit versions without either native dialog API."""
+    st.markdown(
+        f"""
+        <div class="guidelines-dialog-content guidelines-fallback">
+            <span class="eyebrow">Guidelines</span>
+            <h3>How this works</h3>
+            {"".join(
+                f'<div class="g-row"><div class="g-num">{n}</div><div class="g-txt">{t}</div></div>'
+                for n, t in GUIDELINES_STEPS
+            )}
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
+    if st.button("Close Guidelines", key="guidelines_fallback_close", use_container_width=True):
+        st.session_state.show_guidelines = False
+        st.rerun()
 
 
 def result_panel(verdict, sub, pct):
@@ -1532,7 +1563,7 @@ def main():
         ('initial_load', True), ('show_gif', False), ('show_transition', False),
         ('show_analysis', False), ('slideshow_completed', False), ('npi_file', None),
         ('survey_file', None), ('npi_df', None), ('survey_df', None),
-        ('rf_model', None), ('model_accuracy', None),
+        ('rf_model', None), ('model_accuracy', None), ('show_guidelines', False),
     ]:
         if key not in st.session_state:
             st.session_state[key] = default
@@ -1570,6 +1601,8 @@ def main():
     with g_col:
         if st.button("Guidelines", key="guidelines_toggle", use_container_width=True):
             guidelines_dialog()
+    if st.session_state.show_guidelines:
+        render_guidelines_fallback()
 
     # Check if data is already in the database
     data_status = check_data_status()
@@ -1592,7 +1625,8 @@ def main():
             """, unsafe_allow_html=True)
             st.markdown("<div style='height:10px;'></div>", unsafe_allow_html=True)
             if st.button("Try prediction", key="hero_cta", type="primary"):
-                guidelines_dialog()
+                if not guidelines_dialog():
+                    render_guidelines_fallback()
 
         with hero_right:
             st.markdown(HERO_ORGANISM, unsafe_allow_html=True)
