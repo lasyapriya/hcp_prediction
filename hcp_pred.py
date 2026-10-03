@@ -1578,12 +1578,15 @@ def main():
     if st.session_state.initial_load:
         loading_placeholder = st.empty()
         with loading_placeholder:
-            st.markdown(OPENING_ANIMATION, unsafe_allow_html=True)
+            loading_placeholder.html(OPENING_ANIMATION)
             time.sleep(3.2)
         loading_placeholder.empty()
         st.session_state.initial_load = False
 
-    st.markdown(GLOBAL_CSS, unsafe_allow_html=True)
+    # Render the global theme as HTML instead of Markdown. Markdown interprets
+    # indented lines inside the inline SVG flower as code blocks, which exposes
+    # the raw SVG path data over the landing page.
+    st.html(GLOBAL_CSS)
 
     # ---- slim navigation rail ----
     with st.sidebar:
@@ -1635,7 +1638,7 @@ def main():
                     render_guidelines_fallback()
 
         with hero_right:
-            st.markdown(HERO_ORGANISM, unsafe_allow_html=True)
+            st.html(HERO_ORGANISM)
 
         st.markdown('<div class="spacer-xl"></div>', unsafe_allow_html=True)
 
@@ -1859,7 +1862,7 @@ def main():
     if st.session_state.show_transition:
         transition_container = st.empty()
 
-        transition_container.markdown("""
+        transition_container.html("""
         <style>
         .flow { position:fixed; inset:0; z-index:1000;
             background:radial-gradient(900px 640px at 50% 50%, #12061C 0%, #05040A 74%);
@@ -1894,15 +1897,14 @@ def main():
             <div class="flow-t">Analyzing signals</div>
             <div class="flow-d">Prediction surface ready</div>
         </div>
-        """, unsafe_allow_html=True)
+        """)
 
         time.sleep(4.2)
 
         st.session_state.show_transition = False
         st.session_state.show_analysis = True
-        transition_container.markdown(
-            '<div style="position:fixed; inset:0; background:#05040A; z-index:1000;"></div>',
-            unsafe_allow_html=True
+        transition_container.html(
+            '<div style="position:fixed; inset:0; background:#05040A; z-index:1000;"></div>'
         )
         time.sleep(0.15)
         transition_container.empty()
@@ -1998,15 +2000,14 @@ def main():
                         verdict = "Moderate activity"
                     else:
                         verdict = "Low activity"
-                    st.markdown(
+                    st.html(
                         result_panel(
                             verdict,
                             f"{active_n} NPIs are inside their active window at {time_str}. "
                             f"{result['Survey Participants Among Active NPIs']} of them took survey "
                             f"{result['Survey ID']}.",
                             pct
-                        ),
-                        unsafe_allow_html=True
+                        )
                     )
 
                     if result['Active NPIs with Participation Probability']:
