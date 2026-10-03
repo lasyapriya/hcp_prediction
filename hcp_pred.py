@@ -14,11 +14,8 @@ import plotly.graph_objects as go
 import sqlite3
 import os
 import io
-import streamlit.components.v1 as components
-from streamlit.components.v1 import html
 from io import BytesIO
-
-from streamlit_lottie import st_lottie
+from packaging.version import Version
 
 st.set_page_config(
     layout="wide",
@@ -26,6 +23,15 @@ st.set_page_config(
     page_icon="🧬",
     initial_sidebar_state="collapsed",
 )
+
+MIN_STREAMLIT_VERSION = Version("1.64.0")
+if Version(st.__version__) < MIN_STREAMLIT_VERSION:
+    st.error(
+        f"HCPredict requires Streamlit {MIN_STREAMLIT_VERSION} or newer. "
+        f"This deployment is running {st.__version__}; install the updated "
+        "requirements.txt and reboot the app."
+    )
+    st.stop()
 
 
 # ===========================================================================
