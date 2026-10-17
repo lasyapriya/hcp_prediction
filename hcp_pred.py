@@ -654,12 +654,15 @@ html {
     background-attachment: fixed !important;
 }
 body, .stApp, [data-testid="stMain"], [data-testid="stBottom"] { background:transparent !important; }
-#hcp-bio-bg { position:fixed; top:0; left:0; width:100%; height:100%;
-              z-index:-1; pointer-events:none; display:block; }
-/* old SVG/blob background is replaced by the canvas */
-.bio-field { display:none !important; }
-.stApp [data-testid="stAppViewContainer"] { background:transparent !important; }
-[data-testid="stHeader"] { background:transparent !important; }
+html, body { background-color:#05040A !important; }
+#hcp-bio-bg { position:fixed !important; top:0; left:0; width:100vw; height:100vh;
+              z-index:0 !important; pointer-events:none; display:block; }
+.stApp, [data-testid="stApp"], [data-testid="stAppViewContainer"], [data-testid="stMain"],
+[data-testid="stMainBlockContainer"], [data-testid="stHeader"], [data-testid="stBottom"],
+[data-testid="stBottomBlockContainer"], [data-testid="stToolbar"] {
+    background:transparent !important; background-color:transparent !important;
+}
+[data-testid="stAppViewContainer"] { position:relative; z-index:1; }
 /* Full viewport canvas — keep the interface layered over the atmosphere instead
    of putting it inside a narrow centered dashboard window. */
 .block-container {
@@ -1581,8 +1584,17 @@ if (old) {
 
 var cv = D.createElement('canvas');
 cv.id = ID;
-cv.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;display:block;';
+cv.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none;display:block;';
 D.body.insertBefore(cv, D.body.firstChild);
+if (!D.getElementById('hcp-bio-style')) {
+  var stl = D.createElement('style'); stl.id = 'hcp-bio-style';
+  stl.textContent =
+    '.stApp,[data-testid="stApp"],[data-testid="stAppViewContainer"],[data-testid="stMain"],' +
+    '[data-testid="stMainBlockContainer"],[data-testid="stHeader"],[data-testid="stBottom"]' +
+    '{background:transparent!important;background-color:transparent!important;}' +
+    '[data-testid="stAppViewContainer"]{position:relative;z-index:1;}';
+  D.head.appendChild(stl);
+}
 var ctx = cv.getContext('2d');
 var token = {};
 cv.__token = token;
