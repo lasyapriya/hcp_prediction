@@ -1174,8 +1174,6 @@ section[data-testid="stSidebar"] * { color:var(--text-2); font-family:var(--sans
 }
 @media (max-width: 560px) {
     .metrics-grid { grid-template-columns:1fr; }
-    div[data-testid="column"]:has(.npi-card),
-    div[data-testid="column"]:has(.survey-card) { padding:28px 24px 30px; }
     .data-orb { width:52px; height:52px; }
 }
 
@@ -1281,8 +1279,21 @@ div[data-testid="stFileUploader"] section span[data-testid="stIconMaterial"] {
 }
 
 @media (max-width: 900px) {
-    [data-testid="stColumn"]:has(.npi-card),
-    [data-testid="stColumn"]:has(.survey-card) { padding:52px 11% 48px; min-height:0; }
+    .block-container { padding-left:1rem !important; padding-right:1rem !important; }
+    h1 { font-size:46px !important; }
+    .hero-h { font-size:44px; }
+    .nav { flex-direction:column; gap:14px; border-radius:24px; padding:18px; }
+    .nav-links { flex-wrap:wrap; justify-content:center; gap:16px; }
+    .instrument { padding:24px 20px; }
+    .data-card { padding:24px 22px 26px; }
+    .drawer { width:100vw; padding:34px 22px; border-radius:0; }
+    .spacer-xl { height:64px; } .spacer-lg { height:48px; }
+    .result { flex-direction:column; align-items:flex-start; }
+    section[data-testid="stSidebar"] { width:168px !important; min-width:168px !important; }
+    .metrics-grid { grid-template-columns:1fr 1fr; gap:12px; }
+    .metric { padding:18px 20px 16px 22px; }
+    .metric .val { font-size:36px; }
+    .bio-flower { width:125vw; height:88vh; right:-42vw; top:4vh; opacity:0.72; }
 }
 </style>
 
@@ -1414,8 +1425,18 @@ div[data-testid="stFileUploader"] section span[data-testid="stIconMaterial"] {
     <div class="mote m4"></div><div class="mote m5"></div><div class="mote m6"></div>
     <div class="mote m7"></div><div class="mote m8"></div>
 </div>
-"""
 
+"""
+import re
+
+def _encode_svg_uris(css):
+    """Percent-encode < and > inside inline SVG data URIs so the HTML sanitizer
+    doesn't mistake them for tags and strip the whole <style> block."""
+    def fix(m):
+        return m.group(0).replace("<", "%3C").replace(">", "%3E")
+    return re.sub(r'url\("data:image/svg\+xml;utf8,.*?"\)', fix, css, flags=re.S)
+
+GLOBAL_CSS = _encode_svg_uris(GLOBAL_CSS)
 
 OPENING_ANIMATION = """
 <style>
