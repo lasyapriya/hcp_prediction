@@ -1166,17 +1166,121 @@ section[data-testid="stSidebar"] * { color:var(--text-2); font-family:var(--sans
     .metric .val { font-size:36px; }
     .bio-flower { width:125vw; height:88vh; right:-42vw; top:4vh; opacity:0.72; }
     .npi-card, .survey-card,
-    div[data-testid="column"]:has(.npi-card),
+    /*div[data-testid="column"]:has(.npi-card),
     div[data-testid="column"]:has(.survey-card) { transform:none; }
     div[data-testid="column"]:has(.npi-card):hover,
     div[data-testid="column"]:has(.survey-card):hover { transform:translateY(-6px); }
-    .npi-card .data-card-h, .survey-card .data-card-h { font-size:38px; }
+    .npi-card .data-card-h, .survey-card .data-card-h { font-size:38px; }*/
 }
 @media (max-width: 560px) {
     .metrics-grid { grid-template-columns:1fr; }
     div[data-testid="column"]:has(.npi-card),
     div[data-testid="column"]:has(.survey-card) { padding:28px 24px 30px; }
     .data-orb { width:52px; height:52px; }
+}
+
+/* ---------- 13 · HEXAGON GEM CARDS ---------- */
+[data-testid="stColumn"]:has(.npi-card),
+[data-testid="stColumn"]:has(.survey-card) {
+    --cut: 76px;
+    position:relative; isolation:isolate; overflow:visible;
+    min-height:430px;
+    padding:54px calc(var(--cut) + 30px) 50px;
+    clip-path:polygon(var(--cut) 0, calc(100% - var(--cut)) 0, 100% 50%,
+                      calc(100% - var(--cut)) 100%, var(--cut) 100%, 0 50%);
+    /* gold frame */
+    background:linear-gradient(135deg,#FFF1C9 0%,#E9B35E 30%,#FFE7A8 55%,#C98A3C 100%);
+    transition:transform .45s ease, filter .45s ease;
+}
+:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)):hover {
+    transform:translateY(-5px); filter:brightness(1.06);
+}
+/* thin dark line between frame and crystal */
+:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card))::before {
+    content:""; position:absolute; inset:3px; z-index:-1; background:#6B2350;
+    clip-path:polygon(var(--cut) 0, calc(100% - var(--cut)) 0, 100% 50%,
+                      calc(100% - var(--cut)) 100%, var(--cut) 100%, 0 50%);
+}
+/* crystal fill */
+:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card))::after {
+    content:""; position:absolute; inset:6px; z-index:-1;
+    clip-path:polygon(var(--cut) 0, calc(100% - var(--cut)) 0, 100% 50%,
+                      calc(100% - var(--cut)) 100%, var(--cut) 100%, 0 50%);
+}
+[data-testid="stColumn"]:has(.npi-card)::after {
+    background:
+        radial-gradient(420px 220px at 18% 0%, rgba(255,255,255,0.55), transparent 70%),
+        radial-gradient(360px 200px at 100% 100%, rgba(201,155,239,0.55), transparent 70%),
+        linear-gradient(135deg,#FBD3EE 0%,#EFA9DC 42%,#C99BEF 100%);
+}
+[data-testid="stColumn"]:has(.survey-card)::after {
+    background:
+        radial-gradient(420px 220px at 18% 0%, rgba(255,255,255,0.55), transparent 70%),
+        radial-gradient(360px 200px at 100% 100%, rgba(255,138,101,0.50), transparent 70%),
+        linear-gradient(135deg,#FFD9C7 0%,#FFA9A3 44%,#F58BA8 100%);
+}
+
+/* ----- dark text on the crystal ----- */
+:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .eyebrow
+    { color:#8A1F4E !important; }
+:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .data-card-h
+    { color:#1A0710 !important; font-size:46px; line-height:1.02; margin-top:0; }
+:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .sec-d
+    { color:#3B1631 !important; margin-bottom:24px; }
+:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .or-divider,
+:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .upload-label
+    { color:#3B1631 !important; }
+:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .or-divider::before,
+:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .or-divider::after
+    { background:rgba(26,7,16,0.28); }
+:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .status-pill
+    { color:#1A0710 !important; background:rgba(255,255,255,0.45); border:1px solid rgba(26,7,16,0.35); }
+:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .data-orb
+    { background:rgba(255,255,255,0.45); border:1px solid rgba(90,18,56,0.45); box-shadow:none; }
+:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .data-orb svg
+    { stroke:#5A1238 !important; filter:none; }
+
+/* ----- buttons: gold primary, light outlined secondary, all dark text ----- */
+:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) button p
+    { color:inherit !important; }
+:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .stButton > button[kind="primary"] {
+    background:linear-gradient(135deg,#FFE3A3,#F2B766) !important;
+    border:1px solid rgba(107,35,80,0.55) !important; color:#1A0710 !important;
+    box-shadow:0 4px 14px rgba(107,35,80,0.25) !important;
+}
+:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .stButton > button:not([kind="primary"]),
+:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .stDownloadButton > button {
+    background:rgba(255,255,255,0.42) !important;
+    border:1px solid rgba(26,7,16,0.45) !important; color:#1A0710 !important;
+}
+:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .stDownloadButton > button:hover,
+:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .stButton > button:not([kind="primary"]):hover {
+    background:rgba(255,255,255,0.65) !important; color:#000 !important;
+}
+
+/* ----- uploader ----- */
+:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) [data-testid="stFileUploader"] section {
+    background:rgba(255,255,255,0.40) !important;
+    border:1px dashed rgba(26,7,16,0.5) !important;
+}
+:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) [data-testid="stFileUploader"] section :is(span,div,small,p)
+    { color:#3B1631 !important; }
+:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) [data-testid="stFileUploader"] section button
+    { background:#1A0710 !important; border:1px solid #1A0710 !important; }
+:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) [data-testid="stFileUploader"] section button :is(span,div,p)
+    { color:#FFE9F0 !important; }
+
+/* ----- fix "uploaUpload": keep the Material icon font ----- */
+html body span[data-testid="stIconMaterial"],
+div[data-testid="stFileUploader"] section span[data-testid="stIconMaterial"] {
+    font-family:"Material Symbols Rounded" !important;
+}
+
+@media (max-width: 900px) {
+    [data-testid="stColumn"]:has(.npi-card),
+    [data-testid="stColumn"]:has(.survey-card) {
+        --cut: 36px; padding:44px calc(var(--cut) + 18px) 40px;
+    }
 }
 </style>
 
@@ -1593,7 +1697,7 @@ stl.textContent =
   '.stApp,[data-testid="stApp"],[data-testid="stAppViewContainer"],[data-testid="stMain"],' +
   '[data-testid="stMainBlockContainer"],[data-testid="stHeader"],[data-testid="stBottom"]' +
   '{background:transparent!important;background-color:transparent!important;}' +
-  '#hcp-bio-bg{z-index:5!important;mix-blend-mode:screen!important;pointer-events:none!important;}';
+  '#hcp-bio-bg{z-index:5!important;mix-blend-mode:screen!important;pointer-events:none!important;opacity:0.5!important;}';
 D.head.appendChild(stl);
 var ctx = cv.getContext('2d');
 var token = {};
