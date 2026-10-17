@@ -644,17 +644,20 @@ GLOBAL_CSS = """
    glow and warm orange highlights — layered radial gradients standing in for the
    reference image so no external asset is required. Replace with
    `background-image:url(...)` to swap in a real asset later if desired. */
-.stApp {
-    background:
-        radial-gradient(1500px 900px at 86% 4%,  rgba(255,79,135,0.24), transparent 58%),
-        radial-gradient(1200px 820px at 100% 30%, rgba(255,138,101,0.17), transparent 56%),
-        radial-gradient(1000px 760px at 68% 46%, rgba(255,111,157,0.12), transparent 60%),
-        radial-gradient(1300px 940px at 4%  20%, rgba(139,77,255,0.20), transparent 62%),
-        radial-gradient(1000px 780px at 50% 118%, rgba(166,108,255,0.13), transparent 60%),
-        radial-gradient(800px 600px at 30% 0%, rgba(139,77,255,0.10), transparent 55%),
-        linear-gradient(180deg, #030209 0%, #07050C 42%, #0B0610 78%, #0D0712 100%);
-    background-attachment: fixed;
+html {
+    background-color:#05040A !important;
+    background-image:
+        radial-gradient(1500px 900px at 86% 4%,  rgba(255,79,135,0.20), transparent 58%),
+        radial-gradient(1300px 940px at 4%  20%, rgba(139,77,255,0.18), transparent 62%),
+        radial-gradient(1000px 780px at 50% 118%, rgba(166,108,255,0.12), transparent 60%),
+        linear-gradient(180deg, #030209 0%, #07050C 42%, #0B0610 78%, #0D0712 100%) !important;
+    background-attachment: fixed !important;
 }
+body, .stApp, [data-testid="stMain"], [data-testid="stBottom"] { background:transparent !important; }
+#hcp-bio-bg { position:fixed; top:0; left:0; width:100%; height:100%;
+              z-index:-1; pointer-events:none; display:block; }
+/* old SVG/blob background is replaced by the canvas */
+.bio-field { display:none !important; }
 .stApp [data-testid="stAppViewContainer"] { background:transparent !important; }
 [data-testid="stHeader"] { background:transparent !important; }
 /* Full viewport canvas — keep the interface layered over the atmosphere instead
@@ -1559,7 +1562,432 @@ def chart_card(title, description=""):
     desc = f'<div class="card-d">{description}</div>' if description else '<div style="height:10px;"></div>'
     return f'<div class="card"><div class="card-h">{title}</div>{desc}'
 
+BIO_BG_SCRIPT = """
+<script>
+(function () {
+try {
+var W = window, D = document;
+try {
+  if (W.parent && W.parent !== W && W.parent.document && W.parent.document.body) { W = W.parent; D = W.document; }
+} catch (e) { W = window; D = document; }
 
+var ID = 'hcp-bio-bg';
+var old = D.getElementById(ID);
+if (old) {
+  if (old.__alive && (Date.now() - old.__alive) < 1500) { return; }
+  old.__token = null;
+  if (old.parentNode) old.parentNode.removeChild(old);
+}
+
+var cv = D.createElement('canvas');
+cv.id = ID;
+cv.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;display:block;';
+D.body.insertBefore(cv, D.body.firstChild);
+var ctx = cv.getContext('2d');
+var token = {};
+cv.__token = token;
+cv.__alive = Date.now();
+
+var TAU = Math.PI * 2;
+var GLOW = 1.0;   // overall flower intensity (try 0.8 - 1.2)
+var DPR = Math.min(W.devicePixelRatio || 1, 1.75);
+var vw = 0, vh = 0, mobile = false, R = 300, bx = 0, by = 0;
+var cxw = 0, cyw = 0, ox = 0, oy = 0, tx = 0, ty = 0;
+var t = 0, last = null;
+
+/* ---------- palette + glow sprites ---------- */
+var PAL = [[255,79,135],[255,111,157],[255,138,101],[255,176,138],[166,108,255],[139,77,255],[255,217,185]];
+function sprite(rgb, size) {
+  var c = D.createElement('canvas'); c.width = c.height = size;
+  var g = c.getContext('2d'), h = size / 2;
+  var gr = g.createRadialGradient(h, h, 0, h, h, h);
+  gr.addColorStop(0, 'rgba(255,244,230,1)');
+  gr.addColorStop(0.10, 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',0.95)');
+  gr.addColorStop(0.38, 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',0.30)');
+  gr.addColorStop(1, 'rgba(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ',0)');
+  g.fillStyle = gr; g.fillRect(0, 0, size, size);
+  return c;
+}
+var sprites = PAL.map(function (c) { return sprite(c, 64); });
+var pulseSpr = [sprite([255,200,140], 64), sprite([255,111,157], 64), sprite([255,236,214], 64)];
+var nodeSpr = sprite([255,190,150], 32);
+
+/* ---------- petals ---------- */
+var NP = 7, SEG = 64;
+var petals = [];
+var FILLS = [
+  [[0,'rgba(255,196,150,0.52)'],[0.30,'rgba(255,92,138,0.36)'],[0.75,'rgba(166,108,255,0.20)'],[1,'rgba(255,176,138,0.16)']],
+  [[0,'rgba(255,170,140,0.44)'],[0.30,'rgba(166,108,255,0.36)'],[0.75,'rgba(139,77,255,0.22)'],[1,'rgba(255,111,157,0.18)']],
+  [[0,'rgba(255,220,170,0.54)'],[0.30,'rgba(255,138,101,0.40)'],[0.75,'rgba(255,79,135,0.22)'],[1,'rgba(255,176,138,0.13)']]
+];
+var EDGE = ['rgba(255,176,138,0.85)','rgba(196,160,255,0.80)','rgba(255,205,160,0.85)'];
+var EDGE_GLOW = ['rgba(255,79,135,0.16)','rgba(139,77,255,0.18)','rgba(255,138,101,0.16)'];
+var VEIN = ['rgba(255,206,170,0.42)','rgba(224,200,255,0.38)','rgba(255,214,176,0.42)'];
+
+function radiusAt(p, phi, tt) {
+  var k = phi / (p.span / 2);
+  var shape = 1 - 0.60 * Math.pow(Math.abs(k), 2.4);
+  return p.len * shape * (1 + 0.035 * Math.sin(phi * 11 + p.s1 + tt * 0.7) + 0.025 * Math.sin(phi * 23 + p.s2 - tt * 0.5));
+}
+
+function makeVeins(p) {
+  function grow(x, y, ang, len, depth) {
+    var pts = [[x, y]];
+    var steps = Math.max(3, Math.round(len / 0.05));
+    var sl = len / steps, a = ang, px = x, py = y;
+    for (var s = 0; s < steps; s++) {
+      a += (Math.random() - 0.5) * 0.22;
+      px += Math.cos(a) * sl; py += Math.sin(a) * sl;
+      var rr = Math.sqrt(px * px + py * py), ph = Math.atan2(py, px);
+      if (Math.abs(ph) > p.span / 2 * 0.96 || rr > radiusAt(p, ph, 0) * 0.97) break;
+      pts.push([px, py]);
+      var prob = depth === 0 ? 0.26 : (depth === 1 ? 0.16 : 0.10);
+      if (depth < 3 && s > 1 && Math.random() < prob) {
+        p.nodes.push([px, py]);
+        grow(px, py, a + (Math.random() < 0.5 ? -1 : 1) * (0.45 + Math.random() * 0.45), len * 0.55, depth + 1);
+      }
+    }
+    if (pts.length > 2) {
+      var cum = [0];
+      for (var i = 1; i < pts.length; i++) {
+        var dx = pts[i][0] - pts[i-1][0], dy = pts[i][1] - pts[i-1][1];
+        cum.push(cum[i-1] + Math.sqrt(dx * dx + dy * dy));
+      }
+      var path = { pts: pts, cum: cum, total: cum[cum.length - 1], depth: depth };
+      p.veins.push(path);
+      if (depth <= 1 && pts.length >= 4) p.pulsePaths.push(path);
+      p.nodes.push(pts[pts.length - 1]);
+    }
+  }
+  var nMain = 5;
+  for (var m = 0; m < nMain; m++) {
+    grow(0, 0, (m / (nMain - 1) - 0.5) * p.span * 0.78, p.len * 0.98, 0);
+  }
+  if (!p.pulsePaths.length && p.veins.length) p.pulsePaths.push(p.veins[0]);
+}
+
+for (var i = 0; i < NP; i++) {
+  var p = {
+    base: i / NP * TAU + 0.3, span: TAU / NP * 1.6,
+    len: (i % 2 ? 0.84 : 1) * (0.94 + Math.random() * 0.08),
+    s1: Math.random() * TAU, s2: Math.random() * TAU, kind: i % 3, ph: Math.random() * TAU,
+    veins: [], nodes: [], pulsePaths: [], phis: [], cphi: [], sphi: [], ox: [], oy: [],
+    a: 0, ca: 1, sa: 0, Rb: 1
+  };
+  for (var s = 0; s <= SEG; s++) {
+    var phi = (s / SEG - 0.5) * p.span;
+    p.phis.push(phi); p.cphi.push(Math.cos(phi)); p.sphi.push(Math.sin(phi));
+    p.ox.push(0); p.oy.push(0);
+  }
+  makeVeins(p);
+  petals.push(p);
+}
+
+/* ---------- stamens ---------- */
+var stamens = [];
+for (var si = 0; si < 64; si++) {
+  stamens.push({ a: Math.random() * TAU, len: 0.05 + Math.random() * 0.17, ph: Math.random() * TAU, bend: (Math.random() - 0.5) * 0.5 });
+}
+
+/* ---------- pulses / bolts / particles ---------- */
+var pulses = [], bolts = [], parts = [], amb = [];
+var PX = 0, PY = 0;
+function pathPos(path, d) {
+  var c = path.cum, pts = path.pts, i = 1;
+  while (i < c.length - 1 && c[i] < d) i++;
+  var seg = (c[i] - c[i-1]) || 1e-6, f = (d - c[i-1]) / seg;
+  if (f < 0) f = 0; if (f > 1) f = 1;
+  PX = pts[i-1][0] + (pts[i][0] - pts[i-1][0]) * f;
+  PY = pts[i-1][1] + (pts[i][1] - pts[i-1][1]) * f;
+}
+function newPulse(initial) {
+  var p = petals[(Math.random() * NP) | 0];
+  var path = p.pulsePaths[(Math.random() * p.pulsePaths.length) | 0];
+  return { p: p, path: path, d: initial ? Math.random() * path.total : -Math.random() * 1.6,
+           sp: 0.35 + Math.random() * 0.5, c: (Math.random() * 3) | 0 };
+}
+
+function emit(x, y, ang, speed) {
+  if (parts.length >= (mobile ? 300 : 600)) return;
+  parts.push({
+    x: x, y: y, vx: Math.cos(ang) * speed, vy: Math.sin(ang) * speed,
+    age: 0, life: 8 + Math.random() * 9, s: 1.2 + Math.random() * 2.4,
+    spr: sprites[(Math.random() * sprites.length) | 0],
+    tw: Math.random() * TAU, tws: 0.8 + Math.random() * 2.2
+  });
+}
+
+function spawnBolt() {
+  var p = petals[(Math.random() * NP) | 0];
+  var phi = (Math.random() - 0.5) * p.span * 0.8;
+  var ang = p.a + phi;
+  var r = radiusAt(p, phi, t) * p.Rb * (0.7 + Math.random() * 0.3);
+  var ex = cxw + Math.cos(ang) * r, ey = cyw + Math.sin(ang) * r;
+  var n = 14, pts = [], dx = ex - cxw, dy = ey - cyw, len = Math.sqrt(dx * dx + dy * dy) || 1;
+  var nx = -dy / len, ny = dx / len;
+  for (var i = 0; i <= n; i++) {
+    var f = i / n, amp = Math.sin(f * Math.PI) * len * 0.07, off = (Math.random() - 0.5) * 2 * amp;
+    pts.push([cxw + dx * f + nx * off, cyw + dy * f + ny * off]);
+  }
+  bolts.push({ pts: pts, age: 0, life: 0.28 + Math.random() * 0.2 });
+  for (var k = 0; k < 4; k++) emit(ex, ey, ang + (Math.random() - 0.5) * 1.4, 50 + Math.random() * 120);
+}
+
+/* ---------- layout ---------- */
+function seedAmb() {
+  amb.length = 0;
+  var n = mobile ? 70 : 130;
+  for (var i = 0; i < n; i++) {
+    amb.push({ x: Math.random() * vw, y: Math.random() * vh,
+      vx: (Math.random() - 0.5) * 14, vy: (Math.random() - 0.5) * 14 - 3,
+      s: 0.6 + Math.random() * 1.6, tw: Math.random() * TAU, tws: 0.6 + Math.random() * 1.8,
+      spr: sprites[(Math.random() * sprites.length) | 0] });
+  }
+}
+function resize() {
+  vw = W.innerWidth; vh = W.innerHeight;
+  cv.width = Math.round(vw * DPR); cv.height = Math.round(vh * DPR);
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  mobile = vw < 820;
+  if (mobile) { R = Math.min(vw * 0.66, vh * 0.38); bx = vw * 0.5; by = vh * 0.30; }
+  else { R = Math.min(vw * 0.36, vh * 0.62); bx = vw * 0.71; by = vh * 0.44; }
+  seedAmb();
+}
+function onMove(e) {
+  if (cv.__token !== token) return;
+  tx = (e.clientX / vw - 0.5) * -26; ty = (e.clientY / vh - 0.5) * -20;
+}
+resize();
+for (var q = 0; q < (mobile ? 40 : 70); q++) pulses.push(newPulse(true));
+W.addEventListener('resize', resize);
+W.addEventListener('pointermove', onMove, { passive: true });
+
+/* ---------- drawing ---------- */
+function drawHalo() {
+  var g = ctx.createRadialGradient(cxw, cyw, 0, cxw, cyw, R * 1.7);
+  g.addColorStop(0, 'rgba(255,92,138,0.34)');
+  g.addColorStop(0.32, 'rgba(255,111,157,0.16)');
+  g.addColorStop(0.62, 'rgba(139,77,255,0.11)');
+  g.addColorStop(1, 'rgba(139,77,255,0)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, vw, vh);
+}
+
+function updatePetals() {
+  for (var i = 0; i < NP; i++) {
+    var p = petals[i];
+    p.a = p.base + t * 0.025 + 0.05 * Math.sin(t * 0.45 + p.ph);
+    p.ca = Math.cos(p.a); p.sa = Math.sin(p.a);
+    p.Rb = R * (1 + 0.035 * Math.sin(t * 0.7 + p.ph));
+    for (var s = 0; s <= SEG; s++) {
+      var r = radiusAt(p, p.phis[s], t);
+      p.ox[s] = r * p.cphi[s]; p.oy[s] = r * p.sphi[s];
+    }
+  }
+}
+
+function drawPetal(p) {
+  var ca = p.ca, sa = p.sa, Rb = p.Rb, s;
+  var g = ctx.createRadialGradient(cxw, cyw, 0, cxw, cyw, Rb * p.len * 1.02);
+  var st = FILLS[p.kind];
+  for (s = 0; s < st.length; s++) g.addColorStop(st[s][0], st[s][1]);
+  ctx.globalAlpha = Math.min(1, GLOW);
+  ctx.beginPath(); ctx.moveTo(cxw, cyw);
+  for (s = 0; s <= SEG; s++) ctx.lineTo(cxw + (p.ox[s] * ca - p.oy[s] * sa) * Rb, cyw + (p.ox[s] * sa + p.oy[s] * ca) * Rb);
+  ctx.closePath(); ctx.fillStyle = g; ctx.fill();
+
+  ctx.beginPath();
+  for (s = 0; s <= SEG; s++) {
+    var x = cxw + (p.ox[s] * ca - p.oy[s] * sa) * Rb, y = cyw + (p.ox[s] * sa + p.oy[s] * ca) * Rb;
+    if (s === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  ctx.strokeStyle = EDGE_GLOW[p.kind]; ctx.lineWidth = 8; ctx.stroke();
+  ctx.strokeStyle = EDGE[p.kind]; ctx.lineWidth = 1.6; ctx.stroke();
+
+  ctx.globalAlpha = Math.min(1, GLOW) * (0.78 + 0.22 * Math.sin(t * 0.9 + p.ph));
+  ctx.beginPath();
+  for (var v = 0; v < p.veins.length; v++) {
+    var pts = p.veins[v].pts;
+    for (var k = 0; k < pts.length; k++) {
+      var wx = cxw + (pts[k][0] * ca - pts[k][1] * sa) * Rb, wy = cyw + (pts[k][0] * sa + pts[k][1] * ca) * Rb;
+      if (k === 0) ctx.moveTo(wx, wy); else ctx.lineTo(wx, wy);
+    }
+  }
+  ctx.strokeStyle = VEIN[p.kind]; ctx.lineWidth = 0.9; ctx.stroke();
+
+  var ns = Math.max(5, Math.min(11, R / 60));
+  for (var n = 0; n < p.nodes.length; n++) {
+    var nd = p.nodes[n];
+    ctx.globalAlpha = Math.min(1, GLOW) * (0.30 + 0.30 * Math.sin(t * 1.5 + n * 1.7 + p.ph));
+    ctx.drawImage(nodeSpr, cxw + (nd[0] * ca - nd[1] * sa) * Rb - ns, cyw + (nd[0] * sa + nd[1] * ca) * Rb - ns, ns * 2, ns * 2);
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawRings() {
+  ctx.lineWidth = 1;
+  var radii = [0.20, 0.34, 0.50], i;
+  for (i = 0; i < 3; i++) {
+    ctx.beginPath(); ctx.setLineDash([3, 12 + i * 6]); ctx.lineDashOffset = -t * (10 + i * 6) * (i % 2 ? -1 : 1);
+    ctx.arc(cxw, cyw, R * radii[i], 0, TAU);
+    ctx.strokeStyle = i === 1 ? 'rgba(190,150,255,0.40)' : 'rgba(255,160,130,0.42)'; ctx.stroke();
+  }
+  ctx.setLineDash([]);
+}
+
+function drawCore() {
+  var r = R * 0.30 * (1 + 0.08 * Math.sin(t * 1.3));
+  var g = ctx.createRadialGradient(cxw, cyw, 0, cxw, cyw, r);
+  g.addColorStop(0, 'rgba(255,248,222,1)');
+  g.addColorStop(0.12, 'rgba(255,214,150,0.92)');
+  g.addColorStop(0.35, 'rgba(255,138,101,0.55)');
+  g.addColorStop(0.70, 'rgba(255,79,135,0.20)');
+  g.addColorStop(1, 'rgba(139,77,255,0)');
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cxw, cyw, r, 0, TAU); ctx.fill();
+
+  ctx.lineWidth = 1; ctx.strokeStyle = 'rgba(255,214,160,0.55)';
+  var ss = Math.max(4, R / 70);
+  for (var i = 0; i < stamens.length; i++) {
+    var s = stamens[i], a = s.a + 0.06 * Math.sin(t * 0.8 + s.ph), L = s.len * R;
+    var ex = cxw + Math.cos(a) * L, ey = cyw + Math.sin(a) * L;
+    var mx = cxw + Math.cos(a + s.bend) * L * 0.5, my = cyw + Math.sin(a + s.bend) * L * 0.5;
+    ctx.beginPath(); ctx.moveTo(cxw, cyw); ctx.quadraticCurveTo(mx, my, ex, ey); ctx.stroke();
+    ctx.globalAlpha = 0.6 + 0.4 * Math.sin(t * 2 + s.ph);
+    ctx.drawImage(pulseSpr[0], ex - ss, ey - ss, ss * 2, ss * 2);
+    ctx.globalAlpha = 1;
+  }
+}
+
+function updateDrawPulses(dt) {
+  var sc = Math.max(0.6, Math.min(1.3, R / 480));
+  for (var i = 0; i < pulses.length; i++) {
+    var pl = pulses[i];
+    pl.d += pl.sp * dt;
+    if (pl.d >= pl.path.total) {
+      pathPos(pl.path, pl.path.total);
+      var wx = cxw + (PX * pl.p.ca - PY * pl.p.sa) * pl.p.Rb, wy = cyw + (PX * pl.p.sa + PY * pl.p.ca) * pl.p.Rb;
+      var ang = Math.atan2(wy - cyw, wx - cxw);
+      for (var k = 0; k < 3; k++) emit(wx, wy, ang + (Math.random() - 0.5) * 1.1, 40 + Math.random() * 110);
+      pulses[i] = newPulse(false);
+      continue;
+    }
+    if (pl.d < 0) continue;
+    var fade = Math.min(1, pl.d / 0.08), spr = pulseSpr[pl.c], ca = pl.p.ca, sa = pl.p.sa, Rb = pl.p.Rb;
+    for (var j = 0; j < 5; j++) {
+      var dd = pl.d - j * 0.03; if (dd < 0) break;
+      pathPos(pl.path, dd);
+      var sz = (26 - j * 4) * sc;
+      ctx.globalAlpha = Math.min(1, fade * (1 - j * 0.2) * GLOW);
+      ctx.drawImage(spr, cxw + (PX * ca - PY * sa) * Rb - sz / 2, cyw + (PX * sa + PY * ca) * Rb - sz / 2, sz, sz);
+    }
+  }
+  ctx.globalAlpha = 1;
+}
+
+function drawBolts(dt) {
+  for (var i = bolts.length - 1; i >= 0; i--) {
+    var b = bolts[i]; b.age += dt;
+    if (b.age >= b.life) { bolts.splice(i, 1); continue; }
+    var a = (1 - b.age / b.life) * (0.6 + 0.4 * Math.random());
+    ctx.beginPath(); ctx.moveTo(b.pts[0][0], b.pts[0][1]);
+    for (var k = 1; k < b.pts.length; k++) ctx.lineTo(b.pts[k][0], b.pts[k][1]);
+    ctx.strokeStyle = 'rgba(255,111,157,' + (0.22 * a).toFixed(3) + ')'; ctx.lineWidth = 7; ctx.stroke();
+    ctx.strokeStyle = 'rgba(255,228,204,' + (0.9 * a).toFixed(3) + ')'; ctx.lineWidth = 1.4; ctx.stroke();
+  }
+}
+
+var emitAcc = 0, edgeAcc = 0, boltAcc = 0.8;
+function updateDrawParticles(dt) {
+  var rate = mobile ? 14 : 26, erate = mobile ? 6 : 12, i, q;
+  emitAcc += dt * rate; edgeAcc += dt * erate; boltAcc -= dt;
+  while (emitAcc >= 1) {
+    emitAcc -= 1;
+    var a = Math.random() * TAU, r0 = R * (0.03 + Math.random() * 0.10);
+    emit(cxw + Math.cos(a) * r0, cyw + Math.sin(a) * r0, a + (Math.random() - 0.5) * 0.6, 60 + Math.random() * 170);
+  }
+  while (edgeAcc >= 1) {
+    edgeAcc -= 1;
+    var p = petals[(Math.random() * NP) | 0], phi = (Math.random() - 0.5) * p.span * 0.9;
+    var ang = p.a + phi, rr = radiusAt(p, phi, t) * p.Rb;
+    emit(cxw + Math.cos(ang) * rr, cyw + Math.sin(ang) * rr, ang + (Math.random() - 0.5) * 0.9, 30 + Math.random() * 100);
+  }
+  if (boltAcc <= 0) { spawnBolt(); boltAcc = 0.9 + Math.random() * 1.6; }
+
+  for (i = 0; i < amb.length; i++) {
+    q = amb[i];
+    q.x += q.vx * dt; q.y += q.vy * dt;
+    if (q.x < -10) q.x = vw + 10; if (q.x > vw + 10) q.x = -10;
+    if (q.y < -10) q.y = vh + 10; if (q.y > vh + 10) q.y = -10;
+    ctx.globalAlpha = 0.25 + 0.45 * (0.5 + 0.5 * Math.sin(t * q.tws + q.tw));
+    var sa = q.s * 7;
+    ctx.drawImage(q.spr, q.x - sa / 2, q.y - sa / 2, sa, sa);
+  }
+
+  for (i = parts.length - 1; i >= 0; i--) {
+    q = parts[i]; q.age += dt;
+    if (q.age >= q.life || q.x < -250 || q.x > vw + 250 || q.y < -250 || q.y > vh + 250) {
+      parts[i] = parts[parts.length - 1]; parts.pop(); continue;
+    }
+    q.vx += Math.sin(q.y * 0.0045 + t * 0.35 + q.tw) * 16 * dt;
+    q.vy += Math.cos(q.x * 0.0045 - t * 0.30 + q.tw) * 16 * dt;
+    var dmp = 1 - 0.08 * dt; q.vx *= dmp; q.vy *= dmp;
+    q.x += q.vx * dt; q.y += q.vy * dt;
+    var f = q.age / q.life;
+    var al = Math.min(1, q.age / 0.6) * (f > 0.75 ? (1 - f) / 0.25 : 1) * (0.55 + 0.45 * Math.sin(t * q.tws + q.tw));
+    ctx.globalAlpha = Math.max(0, Math.min(1, al));
+    var sz = q.s * 7;
+    ctx.drawImage(q.spr, q.x - sz / 2, q.y - sz / 2, sz, sz);
+  }
+  ctx.globalAlpha = 1;
+}
+
+function frame(now) {
+  if (!cv.isConnected || cv.__token !== token) {
+    W.removeEventListener('resize', resize);
+    W.removeEventListener('pointermove', onMove);
+    return;
+  }
+  if (last === null) last = now;
+  var dt = Math.min(0.05, Math.max(0, (now - last) / 1000)); last = now; t += dt;
+  cv.__alive = Date.now();
+  var k = Math.min(1, dt * 2.5);
+  ox += (tx - ox) * k; oy += (ty - oy) * k;
+  cxw = bx + ox; cyw = by + oy;
+
+  ctx.clearRect(0, 0, vw, vh);
+  ctx.globalCompositeOperation = 'lighter';
+  drawHalo();
+  updatePetals();
+  drawRings();
+  for (var i = 0; i < NP; i++) drawPetal(petals[i]);
+  drawCore();
+  updateDrawPulses(dt);
+  drawBolts(dt);
+  updateDrawParticles(dt);
+  W.requestAnimationFrame(frame);
+}
+W.requestAnimationFrame(frame);
+} catch (err) { try { console.warn('HCPredict background failed:', err); } catch (e2) {} }
+})();
+</script>
+"""
+
+
+def inject_bio_background():
+    """Mounts the full-screen bioluminescent flower canvas behind the app.
+
+    Uses st.html with JS enabled when available; otherwise falls back to a
+    zero-height component iframe that attaches the canvas to the parent page.
+    The script guards against duplicates, so calling it on every rerun is safe.
+    """
+    try:
+        st.html(BIO_BG_SCRIPT, unsafe_allow_javascript=True)
+    except Exception:
+        try:
+            import streamlit.components.v1 as components
+            components.html(BIO_BG_SCRIPT, height=0)
+        except Exception:
+            pass
 def main():
     # Initialize the database
     init_db()
@@ -1587,7 +2015,7 @@ def main():
     # indented lines inside the inline SVG flower as code blocks, which exposes
     # the raw SVG path data over the landing page.
     st.html(GLOBAL_CSS)
-
+    inject_bio_background()
     # ---- slim navigation rail ----
     with st.sidebar:
         st.markdown(
