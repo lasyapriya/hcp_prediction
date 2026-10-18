@@ -1177,100 +1177,94 @@ section[data-testid="stSidebar"] * { color:var(--text-2); font-family:var(--sans
     .data-orb { width:52px; height:52px; }
 }
 
-/* ---------- 13 · FACETED GEM CARDS ---------- */
+/* ---------- 13 · GEM IMAGE CARDS ---------- */
 [data-testid="stColumn"]:has(.npi-card),
 [data-testid="stColumn"]:has(.survey-card) {
-    --ink:#1A0710;          /* main text. try #FFF4F8 for white text like the reference */
-    --ink-soft:#3B1631;
-    --gold:#F2C879;
+    --gem:url("__GEM__");
+    --ink:#000; --ink-soft:#1A0710;
     position:relative; isolation:isolate; overflow:visible;
-    min-height:480px; padding:62px 14% 58px;
+    min-height:600px; padding:122px 150px 112px;
     background:transparent !important; border:0 !important; box-shadow:none !important;
     transition:transform .5s ease;
 }
 [data-testid="stColumn"]:has(.npi-card):hover,
 [data-testid="stColumn"]:has(.survey-card):hover { transform:translateY(-6px); }
 
-/* the gem itself: one stretchable SVG with facets, gold frame and crossing wires */
+/* the gem image, stretched with fixed-size ends so the gold wires never distort */
 [data-testid="stColumn"]:has(.npi-card)::before,
 [data-testid="stColumn"]:has(.survey-card)::before {
     content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
-    background-repeat:no-repeat; background-size:100% 100%;
-    filter:drop-shadow(0 0 22px rgba(255,79,135,0.40)) drop-shadow(0 18px 30px rgba(0,0,0,0.5));
+    box-sizing:border-box; border-style:solid; border-color:transparent;
+    border-width:105px 150px;
+    border-image:var(--gem) 125 230 fill / 105px 150px stretch;
+    filter:drop-shadow(0 0 22px rgba(255,79,135,0.35)) drop-shadow(0 18px 28px rgba(0,0,0,0.5));
     transition:filter .5s ease;
 }
-[data-testid="stColumn"]:has(.npi-card):hover::before,
+[data-testid="stColumn"]:has(.survey-card)::before {
+    filter:hue-rotate(-28deg) saturate(1.1)
+           drop-shadow(0 0 22px rgba(255,138,101,0.38)) drop-shadow(0 18px 28px rgba(0,0,0,0.5));
+}
+[data-testid="stColumn"]:has(.npi-card):hover::before {
+    filter:drop-shadow(0 0 34px rgba(255,111,157,0.6)) drop-shadow(0 22px 32px rgba(0,0,0,0.55));
+}
 [data-testid="stColumn"]:has(.survey-card):hover::before {
-    filter:drop-shadow(0 0 34px rgba(255,111,157,0.62)) drop-shadow(0 22px 34px rgba(0,0,0,0.55));
+    filter:hue-rotate(-28deg) saturate(1.1)
+           drop-shadow(0 0 34px rgba(255,138,101,0.6)) drop-shadow(0 22px 32px rgba(0,0,0,0.55));
 }
 [data-testid="stColumn"]:has(.npi-card)::after,
 [data-testid="stColumn"]:has(.survey-card)::after { display:none; }
 
-/* NPI: rose-violet crystal */
-[data-testid="stColumn"]:has(.npi-card)::before {
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><defs><linearGradient id='c' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23F7A8DD'/><stop offset='0.45' stop-color='%23D46BC4'/><stop offset='1' stop-color='%238C4FD6'/></linearGradient><radialGradient id='h' cx='0.3' cy='0.2' r='0.7'><stop offset='0' stop-color='white' stop-opacity='0.55'/><stop offset='1' stop-color='white' stop-opacity='0'/></radialGradient><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23FFF0C2'/><stop offset='0.35' stop-color='%23E5A94F'/><stop offset='0.6' stop-color='%23FFE3A0'/><stop offset='1' stop-color='%23B77A2E'/></linearGradient></defs><polygon points='0,50 9,2 91,2 100,50 91,98 9,98' fill='%23220A26'/><polygon points='1.6,50 10,3.6 90,3.6 98.4,50 90,96.4 10,96.4' fill='url(%23c)'/><polygon points='1.6,50 10,3.6 50,50' fill='white' fill-opacity='0.16'/><polygon points='10,3.6 50,3.6 50,50' fill='white' fill-opacity='0.08'/><polygon points='50,3.6 90,3.6 62,50' fill='%23ffffff' fill-opacity='0.14'/><polygon points='90,3.6 98.4,50 62,50' fill='%234A1259' fill-opacity='0.22'/><polygon points='98.4,50 90,96.4 62,50' fill='%234A1259' fill-opacity='0.30'/><polygon points='90,96.4 38,96.4 62,50' fill='%23ffffff' fill-opacity='0.07'/><polygon points='38,96.4 10,96.4 50,50' fill='%234A1259' fill-opacity='0.18'/><polygon points='10,96.4 1.6,50 50,50' fill='%23ffffff' fill-opacity='0.12'/><g stroke='white' stroke-opacity='0.35' stroke-width='1' fill='none' vector-effect='non-scaling-stroke'><path vector-effect='non-scaling-stroke' d='M1.6,50 L50,50 L10,3.6 M50,50 L90,3.6 M50,50 L98.4,50 M50,50 L90,96.4 M50,50 L10,96.4 M50,3.6 L50,50 M50,96.4 L50,50'/></g><polygon points='1.6,50 10,3.6 90,3.6 98.4,50 90,96.4 10,96.4' fill='url(%23h)'/><polygon points='0,50 9,2 91,2 100,50 91,98 9,98' fill='none' stroke='url(%23g)' stroke-width='3.2' stroke-linejoin='round' vector-effect='non-scaling-stroke'/><polygon points='2.4,50 10.4,4.4 89.6,4.4 97.6,50 89.6,95.6 10.4,95.6' fill='none' stroke='%23FFE9B0' stroke-width='1' stroke-opacity='0.85' vector-effect='non-scaling-stroke'/><path d='M0,50 C22,-6 78,-6 100,50' fill='none' stroke='url(%23g)' stroke-width='1.6' stroke-opacity='0.9' vector-effect='non-scaling-stroke'/><path d='M0,50 C22,106 78,106 100,50' fill='none' stroke='url(%23g)' stroke-width='1.6' stroke-opacity='0.9' vector-effect='non-scaling-stroke'/><path d='M0,50 C30,22 70,78 100,50' fill='none' stroke='%23FFE9B0' stroke-width='1' stroke-opacity='0.7' vector-effect='non-scaling-stroke'/><path d='M0,50 C30,78 70,22 100,50' fill='none' stroke='%23FFE9B0' stroke-width='1' stroke-opacity='0.7' vector-effect='non-scaling-stroke'/></svg>");
-}
-/* Survey: coral-orange crystal */
-[data-testid="stColumn"]:has(.survey-card)::before {
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><defs><linearGradient id='c' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23FFB89E'/><stop offset='0.45' stop-color='%23FF7F8E'/><stop offset='1' stop-color='%23D94C8A'/></linearGradient><radialGradient id='h' cx='0.3' cy='0.2' r='0.7'><stop offset='0' stop-color='white' stop-opacity='0.55'/><stop offset='1' stop-color='white' stop-opacity='0'/></radialGradient><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23FFF0C2'/><stop offset='0.35' stop-color='%23E5A94F'/><stop offset='0.6' stop-color='%23FFE3A0'/><stop offset='1' stop-color='%23B77A2E'/></linearGradient></defs><polygon points='0,50 9,2 91,2 100,50 91,98 9,98' fill='%23260A1C'/><polygon points='1.6,50 10,3.6 90,3.6 98.4,50 90,96.4 10,96.4' fill='url(%23c)'/><polygon points='1.6,50 10,3.6 50,50' fill='white' fill-opacity='0.18'/><polygon points='10,3.6 50,3.6 50,50' fill='white' fill-opacity='0.08'/><polygon points='50,3.6 90,3.6 62,50' fill='%23ffffff' fill-opacity='0.14'/><polygon points='90,3.6 98.4,50 62,50' fill='%236A1238' fill-opacity='0.22'/><polygon points='98.4,50 90,96.4 62,50' fill='%236A1238' fill-opacity='0.30'/><polygon points='90,96.4 38,96.4 62,50' fill='%23ffffff' fill-opacity='0.07'/><polygon points='38,96.4 10,96.4 50,50' fill='%236A1238' fill-opacity='0.18'/><polygon points='10,96.4 1.6,50 50,50' fill='%23ffffff' fill-opacity='0.12'/><g stroke='white' stroke-opacity='0.35' stroke-width='1' fill='none'><path vector-effect='non-scaling-stroke' d='M1.6,50 L50,50 L10,3.6 M50,50 L90,3.6 M50,50 L98.4,50 M50,50 L90,96.4 M50,50 L10,96.4 M50,3.6 L50,50 M50,96.4 L50,50'/></g><polygon points='1.6,50 10,3.6 90,3.6 98.4,50 90,96.4 10,96.4' fill='url(%23h)'/><polygon points='0,50 9,2 91,2 100,50 91,98 9,98' fill='none' stroke='url(%23g)' stroke-width='3.2' stroke-linejoin='round' vector-effect='non-scaling-stroke'/><polygon points='2.4,50 10.4,4.4 89.6,4.4 97.6,50 89.6,95.6 10.4,95.6' fill='none' stroke='%23FFE9B0' stroke-width='1' stroke-opacity='0.85' vector-effect='non-scaling-stroke'/><path d='M0,50 C22,-6 78,-6 100,50' fill='none' stroke='url(%23g)' stroke-width='1.6' stroke-opacity='0.9' vector-effect='non-scaling-stroke'/><path d='M0,50 C22,106 78,106 100,50' fill='none' stroke='url(%23g)' stroke-width='1.6' stroke-opacity='0.9' vector-effect='non-scaling-stroke'/><path d='M0,50 C30,22 70,78 100,50' fill='none' stroke='%23FFE9B0' stroke-width='1' stroke-opacity='0.7' vector-effect='non-scaling-stroke'/><path d='M0,50 C30,78 70,22 100,50' fill='none' stroke='%23FFE9B0' stroke-width='1' stroke-opacity='0.7' vector-effect='non-scaling-stroke'/></svg>");
-}
-
-/* ----- text on the crystal ----- */
+/* ----- deep black text ----- */
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .eyebrow
     { color:var(--ink-soft) !important; }
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .data-card-h
-    { color:var(--ink) !important; font-size:46px; line-height:1.02; margin-top:0; }
+    { color:var(--ink) !important; font-size:40px; line-height:1.05; margin-top:0; }
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .sec-d
-    { color:var(--ink-soft) !important; margin-bottom:22px; max-width:none; }
+    { color:var(--ink) !important; font-size:16px; margin-bottom:20px; max-width:none; }
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .or-divider,
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .upload-label
-    { color:var(--ink-soft) !important; }
+    { color:var(--ink) !important; }
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .or-divider::before,
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .or-divider::after
-    { background:rgba(26,7,16,0.30); }
+    { background:rgba(0,0,0,0.35); }
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .status-pill
-    { color:var(--ink) !important; background:rgba(255,255,255,0.35); border:1px solid rgba(26,7,16,0.35); }
+    { color:var(--ink) !important; background:rgba(255,255,255,0.45); border:1px solid rgba(0,0,0,0.4); }
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .data-orb
-    { background:rgba(26,7,16,0.28); border:1px solid rgba(255,225,160,0.7); box-shadow:none; }
+    { background:rgba(255,255,255,0.5); border:1px solid rgba(0,0,0,0.35); box-shadow:none; }
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .data-orb svg
-    { stroke:#FFE3A0 !important; filter:none; }
+    { stroke:#000 !important; filter:none; }
 
-/* ----- buttons: gold primary, dark gold-rimmed secondary. text always readable ----- */
+/* ----- buttons: gold primary, light secondary, all with black text ----- */
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .stButton > button[kind="primary"] {
-    background:linear-gradient(135deg,#FFE9B0,#E9B35E) !important;
-    border:1px solid #8A5A1E !important; box-shadow:0 4px 16px rgba(60,20,40,0.35) !important;
-}
-:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .stButton > button[kind="primary"],
-:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .stButton > button[kind="primary"] * {
-    color:#2A0B14 !important;
+    background:linear-gradient(135deg,#FFE9B0,#EBB760) !important;
+    border:1px solid #6B4514 !important; box-shadow:0 4px 14px rgba(60,20,40,0.35) !important;
 }
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .stButton > button:not([kind="primary"]),
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .stDownloadButton > button {
-    background:linear-gradient(135deg,rgba(48,14,36,0.92),rgba(28,8,24,0.92)) !important;
-    border:1px solid var(--gold) !important;
+    background:rgba(255,255,255,0.55) !important;
+    border:1px solid rgba(0,0,0,0.55) !important;
 }
-:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .stButton > button:not([kind="primary"]),
-:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .stButton > button:not([kind="primary"]) *,
+:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .stButton > button,
+:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .stButton > button *,
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .stDownloadButton > button,
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .stDownloadButton > button * {
-    color:#FFEFD0 !important;
+    color:#000 !important;
 }
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .stDownloadButton > button:hover,
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .stButton > button:not([kind="primary"]):hover {
-    border-color:#FFE9B0 !important; box-shadow:0 0 22px rgba(255,214,140,0.45) !important;
+    background:rgba(255,255,255,0.8) !important; box-shadow:0 0 20px rgba(255,255,255,0.5) !important;
 }
 
-/* ----- uploader: dark glass panel, gold Upload button ----- */
+/* ----- uploader ----- */
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) [data-testid="stFileUploader"] section {
-    background:rgba(34,10,28,0.62) !important;
-    border:1px dashed rgba(242,200,121,0.75) !important;
+    background:rgba(255,255,255,0.5) !important; border:1px dashed rgba(0,0,0,0.55) !important;
 }
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) [data-testid="stFileUploader"] section :is(span,div,small,p)
-    { color:#FFEFD0 !important; }
+    { color:#000 !important; }
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) [data-testid="stFileUploader"] section button
-    { background:linear-gradient(135deg,#FFE9B0,#E9B35E) !important; border:1px solid #8A5A1E !important; }
+    { background:#1A0710 !important; border:1px solid #000 !important; }
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) [data-testid="stFileUploader"] section button :is(span,div,p)
-    { color:#2A0B14 !important; }
+    { color:#FFEFD0 !important; }
 
 /* keep the Material icon font so "upload" doesn't print as text */
 html body span[data-testid="stIconMaterial"],
@@ -1279,22 +1273,14 @@ div[data-testid="stFileUploader"] section span[data-testid="stIconMaterial"] {
 }
 
 @media (max-width: 900px) {
-    .block-container { padding-left:1rem !important; padding-right:1rem !important; }
-    h1 { font-size:46px !important; }
-    .hero-h { font-size:44px; }
-    .nav { flex-direction:column; gap:14px; border-radius:24px; padding:18px; }
-    .nav-links { flex-wrap:wrap; justify-content:center; gap:16px; }
-    .instrument { padding:24px 20px; }
-    .data-card { padding:24px 22px 26px; }
-    .drawer { width:100vw; padding:34px 22px; border-radius:0; }
-    .spacer-xl { height:64px; } .spacer-lg { height:48px; }
-    .result { flex-direction:column; align-items:flex-start; }
-    section[data-testid="stSidebar"] { width:168px !important; min-width:168px !important; }
-    .metrics-grid { grid-template-columns:1fr 1fr; gap:12px; }
-    .metric { padding:18px 20px 16px 22px; }
-    .metric .val { font-size:36px; }
-    .bio-flower { width:125vw; height:88vh; right:-42vw; top:4vh; opacity:0.72; }
+    [data-testid="stColumn"]:has(.npi-card),
+    [data-testid="stColumn"]:has(.survey-card) { padding:96px 64px 90px; min-height:0; }
+    [data-testid="stColumn"]:has(.npi-card)::before,
+    [data-testid="stColumn"]:has(.survey-card)::before {
+        border-width:70px 70px; border-image:var(--gem) 125 230 fill / 70px 70px stretch;
+    }
 }
+
 </style>
 
 <div class="bio-field">
@@ -1427,16 +1413,16 @@ div[data-testid="stFileUploader"] section span[data-testid="stIconMaterial"] {
 </div>
 
 """
-import re
+import base64, pathlib
 
-def _encode_svg_uris(css):
-    """Percent-encode < and > inside inline SVG data URIs so the HTML sanitizer
-    doesn't mistake them for tags and strip the whole <style> block."""
-    def fix(m):
-        return m.group(0).replace("<", "%3C").replace(">", "%3E")
-    return re.sub(r'url\("data:image/svg\+xml;utf8,.*?"\)', fix, css, flags=re.S)
+def _load_gem():
+    try:
+        raw = pathlib.Path(__file__).with_name("gem.webp").read_bytes()
+        return "data:image/webp;base64," + base64.b64encode(raw).decode()
+    except Exception:
+        return ""
 
-GLOBAL_CSS = _encode_svg_uris(GLOBAL_CSS)
+GLOBAL_CSS = GLOBAL_CSS.replace("__GEM__", _load_gem())
 
 OPENING_ANIMATION = """
 <style>
