@@ -655,7 +655,7 @@ html {
 }
 body, .stApp, [data-testid="stMain"], [data-testid="stBottom"] { background:transparent !important; }
 html, body { background-color:#05040A !important; }
-#hcp-bio-bg { position:fixed !important; top:0; left:0; width:100vw; height:100vh; z-index:5 !important; pointer-events:none; display:block; mix-blend-mode:screen; }
+#hcp-bio-bg { position:fixed !important; top:0; left:0; width:100vw; height:100vh; z-index:8 !important; pointer-events:none; display:block; mix-blend-mode:screen; }
 /* old CSS/SVG background is replaced by the canvas */
 .bio-field { display:none !important; }
 .stApp, [data-testid="stApp"], [data-testid="stAppViewContainer"], [data-testid="stMain"],
