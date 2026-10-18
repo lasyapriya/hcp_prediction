@@ -2236,7 +2236,7 @@ def main():
 100010,1234567893,15,0
 """
 
-        npi_col, survey_col = st.columns(2, gap="large")
+        npi_col, survey_col = st.columns(2, gap="small")
 
         # ---------------- NPI ----------------
         with npi_col:
