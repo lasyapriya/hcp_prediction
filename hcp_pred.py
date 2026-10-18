@@ -1182,8 +1182,8 @@ section[data-testid="stSidebar"] * { color:var(--text-2); font-family:var(--sans
 [data-testid="stColumn"]:has(.survey-card) {
     --gem:url("__GEM__");
     --ink:#000; --ink-soft:#1A0710;
-    position:relative; isolation:isolate; overflow:visible;
-    min-height:600px; padding:122px 150px 112px;
+    position:relative; isolation:isolate; overflow:visible; z-index:10;
+    min-height:0; padding:84px 150px 78px;
     background:transparent !important; border:0 !important; box-shadow:none !important;
     transition:transform .5s ease;
 }
@@ -1195,8 +1195,8 @@ section[data-testid="stSidebar"] * { color:var(--text-2); font-family:var(--sans
 [data-testid="stColumn"]:has(.survey-card)::before {
     content:""; position:absolute; inset:0; z-index:-1; pointer-events:none;
     box-sizing:border-box; border-style:solid; border-color:transparent;
-    border-width:105px 150px;
-    border-image:var(--gem) 125 230 fill / 105px 150px stretch;
+    border-width:70px 150px;
+    border-image:var(--gem) 125 230 fill / 70px 150px stretch;
     filter:drop-shadow(0 0 22px rgba(255,79,135,0.35)) drop-shadow(0 18px 28px rgba(0,0,0,0.5));
     transition:filter .5s ease;
 }
@@ -1216,21 +1216,21 @@ section[data-testid="stSidebar"] * { color:var(--text-2); font-family:var(--sans
 
 /* ----- deep black text ----- */
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .eyebrow
-    { color:var(--ink-soft) !important; }
+    { color:var(--ink-soft) !important; font-size:15px !important; font-weight:700 !important; }
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .data-card-h
-    { color:var(--ink) !important; font-size:40px; line-height:1.05; margin-top:0; }
+    { color:var(--ink) !important; font-size:52px; font-weight:600 !important; line-height:1.05; margin-top:0; }
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .sec-d
-    { color:var(--ink) !important; font-size:16px; margin-bottom:20px; max-width:none; }
+    { color:var(--ink) !important; font-size:20px; font-weight:600 !important; margin-bottom:20px; max-width:none; }
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .or-divider,
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .upload-label
-    { color:var(--ink) !important; }
+    { color:var(--ink) !important; font-size:17px !important; font-weight:700 !important; }
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .or-divider::before,
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .or-divider::after
     { background:rgba(0,0,0,0.35); }
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .status-pill
     { color:var(--ink) !important; background:rgba(255,255,255,0.45); border:1px solid rgba(0,0,0,0.4); }
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .data-orb
-    { background:rgba(255,255,255,0.5); border:1px solid rgba(0,0,0,0.35); box-shadow:none; }
+    { display:none; }
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .data-orb svg
     { stroke:#000 !important; filter:none; }
 
@@ -1248,7 +1248,7 @@ section[data-testid="stSidebar"] * { color:var(--text-2); font-family:var(--sans
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .stButton > button *,
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .stDownloadButton > button,
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .stDownloadButton > button * {
-    color:#000 !important;
+    color:#000 !important; font-size:17px !important; font-weight:700 !important; letter-spacing:1px !important;
 }
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .stDownloadButton > button:hover,
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .stButton > button:not([kind="primary"]):hover {
@@ -1260,7 +1260,7 @@ section[data-testid="stSidebar"] * { color:var(--text-2); font-family:var(--sans
     background:rgba(255,255,255,0.5) !important; border:1px dashed rgba(0,0,0,0.55) !important;
 }
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) [data-testid="stFileUploader"] section :is(span,div,small,p)
-    { color:#000 !important; }
+    { color:#000 !important; font-size:17px !important; font-weight:700 !important; }
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) [data-testid="stFileUploader"] section button
     { background:#1A0710 !important; border:1px solid #000 !important; }
 :is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) [data-testid="stFileUploader"] section button :is(span,div,p)
@@ -1272,12 +1272,15 @@ div[data-testid="stFileUploader"] section span[data-testid="stIconMaterial"] {
     font-family:"Material Symbols Rounded" !important;
 }
 
+/* tighter spacing around the "or" divider (shorter card) */
+:is([data-testid="stColumn"]:has(.npi-card), [data-testid="stColumn"]:has(.survey-card)) .or-divider { margin:10px 0; }
+
 @media (max-width: 900px) {
     [data-testid="stColumn"]:has(.npi-card),
-    [data-testid="stColumn"]:has(.survey-card) { padding:96px 64px 90px; min-height:0; }
+    [data-testid="stColumn"]:has(.survey-card) { padding:70px 64px 64px; min-height:0; }
     [data-testid="stColumn"]:has(.npi-card)::before,
     [data-testid="stColumn"]:has(.survey-card)::before {
-        border-width:70px 70px; border-image:var(--gem) 125 230 fill / 70px 70px stretch;
+        border-width:50px 70px; border-image:var(--gem) 125 230 fill / 50px 70px stretch;
     }
 }
 
